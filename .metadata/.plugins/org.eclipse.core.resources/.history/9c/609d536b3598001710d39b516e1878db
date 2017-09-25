@@ -1,0 +1,342 @@
+#include "rfsend.h"
+#include "define.h"
+#include "task.h"
+#include "flash.h"
+#include "timer_b.h"
+#include "driversInit.h"
+#include "stdlib.h"
+
+volatile INT8U wdt_times_cnt = 0;
+//volatile INT8U enter_lowpower_mode = 0;
+INT8U   bPacketRcv           = 0;
+INT8U   bNeedCalibrate       = 0;
+INT8U   bNeedConfig          = 0;
+INT8U 	b_node_configured    = 0;
+INT8U   bStart               = 0;
+INT8U   bStop                = 0;
+INT8U   bRun                 = 0;
+
+extern volatile INT8U ADS1230_notified_flag ;
+extern struct WEIGHT_STRUCT weight_def;
+
+static void read_configured_data_from_flash(void){
+	INT8U temp[6] = {0};
+
+	INT8U calibrated_flag = 0;
+	//保护，如果读取内容不争取，如何处理 ,多次读取flash//todo
+	ReadFlash(CTU_Addr, temp, 5);  
+    if(temp[0] == FLASH_VALID){
+	    MyId = temp[1];
+	    MyId = (MyId<< 8) + temp[2];
+	    MyChannel = temp[3];
+	    b_node_configured = temp[4];
+    }
+ 
+    ReadFlash(ADS_ADDR0G, temp, 3);
+    if(temp[0] == FLASH_VALID){
+    	calibrated_flag = 1;
+	    weight_def.zero_calibrated_value = temp[1] << 8;
+	    weight_def.zero_calibrated_value |= temp[2];
+    }
+	ReadFlash(ADS_ADDR500G, temp, 3);
+    if(temp[0] == FLASH_VALID){
+    	calibrated_flag = 2;
+	    weight_def.half_kilo_calibrated_value = temp[1] << 8;
+	    weight_def.half_kilo_calibrated_value |= temp[2];
+    }
+    if(calibrated_flag == 2){
+    	if(weight_def.half_kilo_calibrated_value > weight_def.zero_calibrated_value){
+    		weight_def.weight_ratio = 500 / (weight_def.half_kilo_calibrated_value - weight_def.zero_calibrated_value);
+  			weight_def.offset_value = weight_def.weight_ratio * weight_def.zero_calibrated_value;
+    	}	
+    }
+}
+
+void init_drivers(void){
+	_DINT(); 
+  	InitSysClk(); //1MHZ
+   	InitTimerA(); 
+  	InitTimerB();
+  	init_led();
+  	init_button();
+  	init_ex_adc();
+  	init_beep();
+  	init_adc();
+  	//init_spi();
+	read_configured_data_from_flash();
+	P1OUT |= BIT3; 						 // release PDWN to allow normal operation of ads1230
+    P1IE  |= BIT4 + BIT5 + BIT6;  		// enable buttons and swithcer interrupt
+    P2IE  |= BIT5 ;						//+ BIT2; // enable RF receiving interrupt
+ 	init_cc1101();	
+	//init_wdt();
+	_EINT();
+}
+
+void delay_time(INT16U delay){
+	INT16U i, j ;
+	
+	for(i = 0; i < delay; i++){
+		for(j = 345; j > 0; j--);	
+	}	
+}
+void bond_led_indicate(void){
+	static ulong cal_time_tick;
+	static INT8U led_status = 0;
+	
+	if(timeout(cal_time_tick, 500)){
+		if(led_status == 0){
+			led_status = 1;
+			LED_WEIGHT_ON_6;
+		}
+		else {
+			led_status = 0;
+			LED_WEIGHT_ON_0;
+		}
+		cal_time_tick = local_ticktime();
+	}
+}
+
+INT8U do_sweep_freq(void){
+	INT8U channel_freq_num ;
+	ulong sweep_tick_time;
+	INT8U wireless_com_success_flag = 0;
+	INT8U rbuf[MSG_LEN] = {0};
+	INT8U rlen;
+	channel_freq_num = 0;
+	cc1101_set_channel(channel_freq_num);
+    Delay_ms(100);
+	send_freq_get_request();
+	sweep_tick_time = local_ticktime();
+
+	while( !wireless_com_success_flag){
+		if(timeout(sweep_tick_time, 1000)){
+			channel_freq_num++;
+			if(channel_freq_num < MAX_CHANNEL_NUM){
+				cc1101_set_channel(channel_freq_num);
+				Delay_ms(100);
+				send_freq_get_request();
+				setRxMode();
+			}
+			else{
+				break;
+			}
+			sweep_tick_time = local_ticktime();
+		}
+		if(IsSet(bPacketRcv)){
+			CLR_FLG(bPacketRcv);
+			rlen = sizeof(rbuf);
+			if(halRfReceivePacket(rbuf, &rlen)){
+				if(process_freq_requeset(rbuf, rlen) == 1){
+					MyChannel = channel_freq_num;	
+					wireless_com_success_flag = 1;	
+				}
+			}
+		    memset(rbuf, 0, MSG_LEN);
+		}
+		bond_led_indicate();
+	}
+	if(wireless_com_success_flag == 1){
+		return 1;	
+	}
+	return 0;
+}
+#define MAX_DEV_REQ_TIMES 3
+#define BOND_WAIT_TIME  30000
+void dev_request(void){
+	ulong req_ack_tick_time;
+	INT8U times;
+	INT8U rbuf[MSG_LEN] = {0};
+	INT8U rlen;
+
+	SendConfigRequest();
+	req_ack_tick_time = local_ticktime();
+	times = 0; 
+	while(times < MAX_DEV_REQ_TIMES){
+		if(timeout(req_ack_tick_time, BOND_WAIT_TIME)){
+			times++;
+			SendConfigRequest();
+			setRxMode();
+			req_ack_tick_time = local_ticktime();
+		}
+		if(IsSet(bPacketRcv)){
+			CLR_FLG(bPacketRcv);
+			rlen = sizeof(rbuf);
+			if(halRfReceivePacket(rbuf, &rlen)){
+				if(process_dev_requeset(rbuf, rlen) == 1){
+					LED_WEIGHT_ON_6;
+					beep_test();
+					Delay_ms(500);
+		  			beep_test();
+		  			Delay_ms(500);
+					LED_WEIGHT_ON_0;
+					break;
+				}
+			}
+		    memset(rbuf, 0, MSG_LEN);
+		}
+		bond_led_indicate();
+	}
+	if(times == MAX_DEV_REQ_TIMES){
+		LED_WEIGHT_ON_0;
+		beep_test();
+		Delay_ms(200);
+		beep_test();
+		Delay_ms(200);
+		beep_test();
+		Delay_ms(200);
+		beep_test();
+	}
+}
+#define FLASH_LED_TIME  1000
+void test_local_led(void){
+	static ulong led_time_tick;
+	static INT8U led_status;
+	
+	if(timeout(led_time_tick, FLASH_LED_TIME)){
+		if(led_status == 0){
+			led_status = 1;
+			LED_WEIGHT_ON_1;
+		}
+		else{
+			led_status = 0;
+			LED_WEIGHT_ON_0;
+		}
+		led_time_tick = local_ticktime();
+	}
+}
+
+#define BOTTLE_BLINK_TIME 20000
+void bottle_type_indicate(void){
+	static ulong bottle_type_indicate_tick_time;
+	
+	if(timeout(bottle_type_indicate_tick_time, BOTTLE_BLINK_TIME)){
+ 		if (LED_SWITCH_ON){
+		 	if (BOTTLE == ContainerType){
+		 		LED_TYPE_BOTTLE_ON;
+		 		LED_TYPE_BAG_OFF;
+		 	}
+		 	else{
+		 		LED_TYPE_BAG_ON;
+		 		LED_TYPE_BOTTLE_OFF;
+		 	}
+		 }
+		bottle_type_indicate_tick_time = local_ticktime();	
+	}
+}
+#define HEART_BEAT_TIME 20000
+INT8U heart_beat_tick(void){
+	static ulong heart_beat_tick_time;
+	
+	if(timeout(heart_beat_tick_time, HEART_BEAT_TIME)){				
+		heart_beat_tick_time = local_ticktime();
+		return 1;
+	}
+	return 0;
+}
+
+#define RUN_TIME	5000
+INT8U run_time_tick(void){
+	static ulong run_tick_time;
+	
+	if(timeout(run_tick_time, RUN_TIME)){
+		run_tick_time = local_ticktime();
+		return 1;
+	}	
+	return 0;	
+}
+volatile unsigned int i;
+
+int main(void){
+//	INT8U    rbuf[MSG_LEN] = {0};
+//	INT8U    rlen;
+	
+    disable_wdt();
+	init_drivers();	
+	ads1230_start_calibrate();
+	beep_test();
+  	//init_wdt();
+  	//enter_lowpower_mode = 1;
+ /* P1DIR = 0xFF;                             // All P1.x outputs
+  P1OUT = 0xff;                                // All P1.x reset
+  P2DIR = 0xFF;                             // All P2.x outputs
+  P2OUT = 0xEf;                                // All P2.x reset
+  P3DIR = 0xFF;                             // All P3.x outputs
+  P3OUT = 0xff;                                // All P3.x reset
+  P4DIR = 0xFF;                             // All P4.x outputs
+  P4OUT = 0xff;                                // All P4.x reset
+  */
+	while(1){
+		//send_freq_get_request();
+		 	//TIMER_B_START;
+			 if(IsClr(bRun)){
+				bottle_type_indicate();
+			 } 
+			 else{
+			 	LED_TYPE_BAG_OFF;
+			 	LED_TYPE_BOTTLE_OFF;
+			 }
+			//床位配置成功
+			 if(b_node_configured == 1){ 	
+				if (IsSet(bStart)){
+					Start();
+					SET_FLG(bRun);
+					CLR_FLG(bStart);
+				}		
+				else if (IsSet(bStop)){
+					Stop();
+					CLR_FLG(bRun);
+					CLR_FLG(bStop);
+				}
+				else{
+					if (IsSet(bRun)){ 
+							Run();
+					}else{
+						HeartBeat();
+					}	
+				}
+			}
+			//无线数据接收	
+			/*if(IsSet(bPacketRcv)){
+				CLR_FLG(bPacketRcv);
+				rlen = sizeof(rbuf);
+				if(halRfReceivePacket(rbuf, &rlen)){
+					ProcessRcvdPacket(rbuf, rlen);
+				}
+			    memset(rbuf, 0, MSG_LEN);
+			} */
+			 //  长按K1 --tested
+			if (IsSet(bNeedCalibrate)){
+				CLR_FLG(bNeedCalibrate);
+				ads1230_Calibrate();//todo 容器校准 
+			}
+				
+			// 配置床号， 长按K2
+			if (IsSet(bNeedConfig)){ 
+				if(do_sweep_freq() == 1){
+					dev_request(); 
+					CLR_FLG(bNeedConfig);
+				}
+			}
+			//TIMER_B_STOP;
+			//LED_WEIGHT_ON_0;
+			//__bis_SR_register(LPM3_bits + GIE);     // Enter LPM3, enable interrupts
+	}
+}
+#pragma vector = WDT_VECTOR
+__interrupt void watchdog_timer(void){
+	static INT8U led_status;
+	if(led_status == 0){
+		led_status = 1;
+		LED_WEIGHT_ON_0;
+	}
+	else{
+		led_status = 0;
+		LED_WEIGHT_ON_1;
+	}
+	wdt_times_cnt++;
+	if(wdt_times_cnt >= 3){
+		wdt_times_cnt = 0;
+		__bic_SR_register_on_exit(LPM3_bits);     // Clear LPM3 bits from 0(SR)
+	}
+}
+

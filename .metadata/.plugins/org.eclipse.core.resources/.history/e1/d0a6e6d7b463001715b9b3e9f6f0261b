@@ -1,0 +1,88 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+# Add inputs and outputs from these tool invocations to the build variables 
+CPP_SRCS += \
+C:/Users/WORKMAN/Desktop/workspace/shared/flash.cpp \
+../main.cpp \
+../process.cpp \
+../rf_op.cpp \
+../timer_a.cpp 
+
+CMD_SRCS += \
+../lnk_msp430f2272.cmd 
+
+CPP_DEPS += \
+./flash.pp \
+./main.pp \
+./process.pp \
+./rf_op.pp \
+./timer_a.pp 
+
+OBJS += \
+./flash.obj \
+./main.obj \
+./process.obj \
+./rf_op.obj \
+./timer_a.obj 
+
+OBJS__QTD += \
+".\flash.obj" \
+".\main.obj" \
+".\process.obj" \
+".\rf_op.obj" \
+".\timer_a.obj" 
+
+CPP_DEPS__QTD += \
+".\flash.pp" \
+".\main.pp" \
+".\process.pp" \
+".\rf_op.pp" \
+".\timer_a.pp" 
+
+CPP_SRCS_QUOTED += \
+"C:/Users/WORKMAN/Desktop/workspace/shared/flash.cpp" \
+"../main.cpp" \
+"../process.cpp" \
+"../rf_op.cpp" \
+"../timer_a.cpp" 
+
+
+# Each subdirectory must supply rules for building sources it contributes
+flash.obj: C:/Users/WORKMAN/Desktop/workspace/shared/flash.cpp $(GEN_OPTS) $(GEN_SRCS)
+	@echo 'Building file: $<'
+	@echo 'Invoking: Compiler'
+	"C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/bin/cl430" -vmsp -g --define=__MSP430F2272__ --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/msp430/include" --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/include" --include_path="../../shared/include" --diag_warning=225 --printf_support=minimal --preproc_with_compile --preproc_dependency="flash.pp" $(GEN_OPTS_QUOTED) $(subst #,$(wildcard $(subst $(SPACE),\$(SPACE),$<)),"#")
+	@echo 'Finished building: $<'
+	@echo ' '
+
+main.obj: ../main.cpp $(GEN_OPTS) $(GEN_SRCS)
+	@echo 'Building file: $<'
+	@echo 'Invoking: Compiler'
+	"C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/bin/cl430" -vmsp -g --define=__MSP430F2272__ --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/msp430/include" --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/include" --include_path="../../shared/include" --diag_warning=225 --printf_support=minimal --preproc_with_compile --preproc_dependency="main.pp" $(GEN_OPTS_QUOTED) $(subst #,$(wildcard $(subst $(SPACE),\$(SPACE),$<)),"#")
+	@echo 'Finished building: $<'
+	@echo ' '
+
+process.obj: ../process.cpp $(GEN_OPTS) $(GEN_SRCS)
+	@echo 'Building file: $<'
+	@echo 'Invoking: Compiler'
+	"C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/bin/cl430" -vmsp -g --define=__MSP430F2272__ --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/msp430/include" --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/include" --include_path="../../shared/include" --diag_warning=225 --printf_support=minimal --preproc_with_compile --preproc_dependency="process.pp" $(GEN_OPTS_QUOTED) $(subst #,$(wildcard $(subst $(SPACE),\$(SPACE),$<)),"#")
+	@echo 'Finished building: $<'
+	@echo ' '
+
+rf_op.obj: ../rf_op.cpp $(GEN_OPTS) $(GEN_SRCS)
+	@echo 'Building file: $<'
+	@echo 'Invoking: Compiler'
+	"C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/bin/cl430" -vmsp -g --define=__MSP430F2272__ --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/msp430/include" --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/include" --include_path="../../shared/include" --diag_warning=225 --printf_support=minimal --preproc_with_compile --preproc_dependency="rf_op.pp" $(GEN_OPTS_QUOTED) $(subst #,$(wildcard $(subst $(SPACE),\$(SPACE),$<)),"#")
+	@echo 'Finished building: $<'
+	@echo ' '
+
+timer_a.obj: ../timer_a.cpp $(GEN_OPTS) $(GEN_SRCS)
+	@echo 'Building file: $<'
+	@echo 'Invoking: Compiler'
+	"C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/bin/cl430" -vmsp -g --define=__MSP430F2272__ --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/msp430/include" --include_path="C:/Program Files (x86)/Texas Instruments/ccsv4/tools/compiler/msp430/include" --include_path="../../shared/include" --diag_warning=225 --printf_support=minimal --preproc_with_compile --preproc_dependency="timer_a.pp" $(GEN_OPTS_QUOTED) $(subst #,$(wildcard $(subst $(SPACE),\$(SPACE),$<)),"#")
+	@echo 'Finished building: $<'
+	@echo ' '
+
+

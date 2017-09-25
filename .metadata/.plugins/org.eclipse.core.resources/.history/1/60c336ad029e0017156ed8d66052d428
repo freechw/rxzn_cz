@@ -1,0 +1,234 @@
+#ifndef TASK_H_
+#define TASK_H_
+
+#include <string.h>
+#include "tools.h"
+#include "msp430f2272.h"
+
+#define MAX_CALIBRATE_TIMES 10
+#define WEIGHT_SENSOR_OFFSET 0
+#define WIRE_PACKET_HEAD_1 0x55
+#define WIRE_PACKET_HEAD_2 0xAA
+
+// weight leds
+#define LED51 (~BIT7)
+#define LED50 (BIT7)
+#define LED41 (~BIT6)
+#define LED40 (BIT6)
+#define LED31 (~BIT5)
+#define LED30 (BIT5)
+#define LED21 (~BIT2)
+#define LED20 (BIT2)
+#define LED11 (~BIT1)
+#define LED10 (BIT1)
+#define LED01 (~BIT0)
+#define LED00 (BIT0)
+
+#define WEIHGT_LED_1_ON P4OUT &= LED01	
+#define WEIHGT_LED_2_ON P4OUT &= LED11
+#define WEIHGT_LED_3_ON P4OUT &= LED21
+#define WEIHGT_LED_4_ON P4OUT &= LED31
+#define WEIHGT_LED_5_ON P4OUT &= LED41
+#define WEIHGT_LED_6_ON P4OUT &= LED51
+	
+#define LED_WEIGHT_ON_6 \
+		((((((P4OUT &= LED01) &= LED11) &= LED21) &= LED31) &= LED41) &= LED51)
+#define LED_WEIGHT_ON_5 \
+		((((((P4OUT &= LED01) &= LED11) &= LED21) &= LED31) &= LED41) |= LED50)
+#define LED_WEIGHT_ON_4 \
+		((((((P4OUT &= LED01) &= LED11) &= LED21) &= LED31) |= LED40) |= LED50)
+#define LED_WEIGHT_ON_3 \
+		((((((P4OUT &= LED01) &= LED11) &= LED21) |= LED30) |= LED40) |= LED50)
+#define LED_WEIGHT_ON_2 \
+		((((((P4OUT &= LED01) &= LED11) |= LED20) |= LED30) |= LED40) |= LED50)
+#define LED_WEIGHT_ON_1 \
+		((((((P4OUT &= LED01) |= LED10) |= LED20) |= LED30) |= LED40) |= LED50)
+#define LED_WEIGHT_ON_0 \
+		((((((P4OUT |= LED00) |= LED10) |= LED20) |= LED30) |= LED40) |= LED50)
+
+// Type leds
+#define LED_TYPE_BOTTLE_BLINK    P1OUT ^= BIT6
+#define LED_TYPE_BOTTLE_ON       (if(LED_SWITCH_ON) P1OUT &= ~BIT6;)
+#define LED_TYPE_BOTTLE_OFF      P1OUT |= BIT6
+
+#define LED_TYPE_BAG_BLINK    P1OUT ^= BIT0
+#define LED_TYPE_BAG_ON()       (if(LED_SWITCH_ON) P1OUT &= ~BIT0;)
+#define LED_TYPE_BAG_OFF      P1OUT |= BIT0
+
+// sign led
+#define LED_SIGN_BLINK      P4OUT ^= BIT3
+#define LED_SIGN_ON();         (if(LED_SWITCH_ON) P4OUT &= ~BIT3;)
+#define LED_SIGN_OFF        P4OUT |= BIT3
+    
+// alarm led
+#define LED_ALARM_ON        P4OUT &= ~BIT4
+#define LED_ALARM_OFF       P4OUT |= BIT4
+
+// beeper
+#define BEEP_ON             P2OUT |= BIT4
+#define BEEP_OFF            P2OUT &= ~BIT4
+
+// dial switcher
+#define DIAL_SWITCH1_ON     IsClr((P3IN & BIT6))
+#define DIAL_SWITCH2_ON     IsClr((P3IN & BIT7))
+
+// led switcher
+#define LED_SWITCH_ON       (!IsClr(P1IN & BIT4))
+#define LED_SWITCH_OFF      (IsClr(P1IN & BIT4))
+#define LED_SWITCH_INT      (!IsClr(P1IFG & BIT4))
+#define LED_SWITCH_INT_D    (P1IE &= ~BIT4)
+#define LED_SWITCH_INT_E    (P1IE |= BIT4)
+#define LED_SWITCH_INT_C    (P1IFG &= ~BIT4)
+
+// start button
+#define START_BUTTON_DW     (IsClr(P1IN & BIT5))
+#define START_BUTTON_UP     (!IsClr(P1IN & BIT5))
+#define START_BUTTON_INT    (!IsClr(P1IFG & BIT5))
+#define START_BUTTON_INT_D  (P1IE &= ~BIT5)
+#define START_BUTTON_INT_E  (P1IE |= BIT5)
+#define START_BUTTON_INT_C  (P1IFG &= ~BIT5)
+
+// function button
+#define FUNCT_BUTTON_DW     (IsClr(P1IN & BIT7))
+#define FUNCT_BUTTON_UP     (!IsClr(P1IN & BIT7))
+#define FUNCT_BUTTON_INT    (!IsClr(P1IFG & BIT7))
+#define FUNCT_BUTTON_INT_D  (P1IE &= ~BIT7)
+#define FUNCT_BUTTON_INT_E  (P1IE |= BIT7)
+#define FUNCT_BUTTON_INT_C  (P1IFG &= ~BIT7)
+// ads Dout
+#define ADS_DOUT_DW     (IsClr(P1IN & BIT1))
+#define ADS_DOUT_UP     (!IsClr(P1IN & BIT1))
+#define ADS_DOUT_INT    (!IsClr(P1IFG & BIT1))
+#define ADS_DOUT_INT_D  (P1IE &= ~BIT1)
+#define ADS_DOUT_INT_E  (P1IE |= BIT1)
+#define ADS_DOUT_INT_C  (P1IFG &= ~BIT1)
+#define ADS_POWER_DONW	(P1OUT &= ~BIT3)
+#define ADS_POWER_ON	(P1OUT |= BIT3) 
+	
+#define ADS_CLk_SET() 	(P1OUT |= BIT2)
+#define ADS_CLK_CLR() 	(P1OUT &= ~BIT2)
+#define ADS_DOUT()	  	(P1IN & BIT1)
+
+#define TIMER_A_START       (TACTL |= MC_1)
+#define TIMER_A_STOP        (TACTL &= ~MC_1)
+#define TIMER_B_START       (TBCTL |= MC_1)
+#define TIMER_B_STOP        (TBCTL &= ~MC_1)
+// RF receiving port
+#define RF_GDO0_INT         (!IsClr(P2IFG & BIT2))
+#define RF_GDO0_INT_D       (P2IE &= ~BIT2)
+#define RF_GDO0_INT_E       (P2IE |= BIT2)
+#define RF_GDO0_INT_C       (P2IFG &= ~BIT2)
+
+#define RF_GDO2_INT         (!IsClr(P2IFG & BIT5))
+#define RF_GDO2_INT_D       (P2IE &= ~BIT5)
+#define RF_GDO2_INT_E       (P2IE |= BIT5)
+#define RF_GDO2_INT_C       (P2IFG &= ~BIT5)
+// heart beat interval of timer B
+#define HB_INTVL            2000
+// bottle blink interval of timer B
+#define BOT_BLINK_INTVL     200
+// long pressing interval of timer A
+#define L_PRESS_INTVL       20
+// short pressing interval of timer A
+#define S_PRESS_INTVL       1
+// the flash memory address of weighter's iformation of ID and Channel
+#define CTU_Addr            0x01000
+// the flash memory address of weighter's sensor data (ADS1230)
+#define FLASH_VALID			 0x55
+#define ADS_ADDR0G           0x01010
+#define OFFSET_ADDR			 0x00004
+#define ADS_ADDR500G         (ADS_ADDR0G + OFFSET_ADDR)
+
+/*******************************************************************************
+ ***************************enums goes here*************************************
+ ******************************************************************************/
+typedef enum{
+	BAG,
+	BOTTLE
+}eContainerType;
+
+struct WEIGHT_STRUCT{
+	ulong	zero_calibrated_value ;
+	ulong 	half_kilo_calibrated_value;
+	float weight_ratio;
+	INT8U offset_value;
+};
+/*******************************************************************************
+ *************************external globals**************************************
+ ******************************************************************************/
+extern eContainerType  ContainerType;
+extern INT16U          MyId;  		// my own identifier
+extern INT8U           MyChannel;
+extern INT8U           bStop;
+
+/*******************************************************************************
+ *************************APIs go here******************************************
+ ******************************************************************************/
+void delay(unsigned long nus);
+void Delay_1ms(void);
+void Delay_nms(unsigned long s);
+void usart_send_bytes(INT8U *buf, INT8U len);
+void beep_beep(void);
+INT16U get_battery_value(void);
+void HeartBeat(void);
+void ads1230_start_calibrate(void);
+void ads1230_Calibrate(void);
+INT16U ReadWeight(void);
+void weight_led(INT8U num);
+void Start(void);
+void Run(void);
+void Stop(void);
+
+void send_freq_get_request(void);
+void SendConfigRequest(void);
+INT8U ProcessRcvdPacket(INT8U *rbuf, INT8U rlen);
+
+inline void LedAllSwitchOff(void){
+	P4OUT = 0xff;
+	P1OUT |= BIT6;
+	P1OUT |= BIT0;
+}
+ 
+inline void SendBlink(void){
+    Delay_ms(50);
+    LED_SIGN_OFF;
+}
+
+inline void AllWeightLedBlinkOnce(void){
+    LED_WEIGHT_ON_6;
+    Delay_ms(50);  
+    LED_WEIGHT_ON_0;
+}
+
+inline void AllWeightLedBlinkTwice(void){
+    LED_WEIGHT_ON_6;
+    Delay_ms(50);
+    LED_WEIGHT_ON_0; 
+    Delay_ms(100); 
+    LED_WEIGHT_ON_6;  
+    Delay_ms(50);  
+    LED_WEIGHT_ON_0;
+}
+
+inline void AllWeightLedWaterFlow(void){	
+	WEIHGT_LED_1_ON;
+	Delay_ms(50);
+	WEIHGT_LED_2_ON;
+	Delay_ms(50);
+	WEIHGT_LED_3_ON;
+	Delay_ms(50);
+	WEIHGT_LED_4_ON;
+	Delay_ms(50);
+	WEIHGT_LED_5_ON;
+	Delay_ms(50);
+	WEIHGT_LED_6_ON;
+	Delay_ms(50);
+	LED_WEIGHT_ON_0;
+}
+
+inline void disable_wdt(void){
+	WDTCTL = WDTPW + WDTHOLD;  
+	IE1 &= ~WDTIE;
+}
+
+#endif /*TASK_H_*/

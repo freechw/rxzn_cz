@@ -1,0 +1,22 @@
+//#include "msp430f2272.h"
+#include "Define.h"
+#include "task.h"
+#include "interrupt.h"
+
+// interrupt for receiving data
+#pragma vector=PORT2_VECTOR
+__interrupt void PORT2_ISR (void)
+{
+	if(RF_RECV_INT)
+	{
+		RF_RECV_INT_D;
+		
+		RF_RECV_INT_C;
+		
+		SET_FLG(bPacketRcv);
+		
+	    RF_RECV_INT_E;	
+	}
+	
+	__bic_SR_register_on_exit(LPM3_bits);
+}

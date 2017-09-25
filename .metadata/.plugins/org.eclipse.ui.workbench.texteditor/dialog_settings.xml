@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="1373"/>
+		<item key="DIALOG_Y_ORIGIN" value="204"/>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item key="wholeword" value="true"/>
+		<item key="incremental" value="false"/>
+		<item key="isRegEx" value="false"/>
+		<item key="selection" value="enter_lp_mode"/>
+		<item key="wrap" value="false"/>
+		<item key="casesensitive" value="false"/>
+		<list key="findhistory">
+			<item value="enter_lp_mode"/>
+			<item value="get_battery_value"/>
+			<item value="on"/>
+			<item value="ADS_CLk_SET"/>
+			<item value="WEIHGT_LED_1_ON"/>
+			<item value="weight_led"/>
+			<item value="main"/>
+			<item value="mian"/>
+		</list>
+		<list key="replacehistory">
+			<item value="Delay_nms"/>
+			<item value="delay_times"/>
+			<item value="ReadWeight"/>
+			<item value="MSG_BODY_S"/>
+			<item value="bHeartBeat"/>
+			<item value="bStart"/>
+			<item value="Stop"/>
+			<item value="Run"/>
+		</list>
+	</section>
+</section>

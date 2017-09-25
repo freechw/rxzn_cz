@@ -1,0 +1,166 @@
+#ifndef DRIVERSINIT_H_
+#define DRIVERSINIT_H_
+
+#include "msp430f2272.h"
+inline void InitSysClk(void){
+ /* if (CALBC1_1MHZ==0xFF){					// If calibration constant erased										
+    while(1);                               // do not load, trap CPU!!	
+  }
+  DCOCTL = 0; */                              // Select lowest DCOx and MODx settings
+  BCSCTL1 = CALBC1_8MHZ;
+  DCOCTL  = CALDCO_8MHZ;
+  //BCSCTL3 |= LFXT1S_2; // basic clock, VLOCLK
+  BCSCTL1 |= DIVA_3;                        // ACLK/8
+}
+
+inline void InitTimerA(void){
+	// clock source: aclK,= 32768/8 Hz
+	// ID3 : div 8
+	// TACLR: Clear
+	//default: up count mode, MC0
+	TACTL = TASSEL_1 + ID_3 + MC_1 + TACLR;  
+	TAR = 0;
+	// 16 bits
+	TACCR0 = 51;	//100ms interval time
+	//enable interrupt
+	TACCTL0 = CCIE;
+}
+
+inline void InitTimerB(void){
+	//BCSCTL1 |= DIVA_3;                        // ACLK/8
+	//TBCCR0 = 10240; // 20s interval
+	//clock source : aclk 
+	// ID3 : div 8 
+	TBCCR0 = 5;//10ms
+	TBCTL = TBSSEL_1 + ID_3 + MC_1 + TACLR;
+	//TBCTL = TBSSEL_2 + ID_3 + MC_1 + TACLR;
+	TBCCTL0 = CCIE;
+}
+/*
+ * Stauts LED   P1.7
+ * Signal LED	P4.3
+ * Alarm  LED   p4.4
+ * Weight LEDs  P4.0 - P4.1 - P4.2 - P4.5 - P4.6 - P 4.7
+ */
+inline void init_led(void){
+  	//status led P1.7
+  	P1DIR |= BIT0 + BIT7 ;    // output direction
+  	P1SEL &= ~(BIT0 + BIT7);   // select as I / O function
+  	P1OUT |= BIT0 + BIT7;        
+  	
+  	P4DIR |= 0xFF; // output direction
+  	P4OUT |= 0xFF; // initially all switch off
+}
+ /* 
+  * Slide button   P1.4
+  * Function       P1.5
+  * ST/P		   P1.6
+  * 
+  * 拨码开关
+  * code0： 		   P3.6
+  * code1： 		   P3.7
+  */
+ inline void init_button(void){
+ 	//buttons
+  	P1DIR &= ~(BIT4 + BIT5 + BIT6); // input
+  	P1IES |= BIT4 + BIT5 + BIT6;   // interrupt falling
+  	P1REN |= BIT4 + BIT5 + BIT6;   // this line and the next 
+  	P1OUT |= BIT4 + BIT5 + BIT6;   // enable the pullup resister
+  	P1SEL &= ~(BIT4 + BIT5 + BIT6); // select as I/O function
+  	
+  	P3DIR &= ~(BIT7 + BIT6); // input
+  	P3REN |=  BIT7 + BIT6;   // this line and the next 
+  	P3OUT |=  BIT7 + BIT6;   // enable the pullup resister
+
+  	/*
+  	P2DIR &= ~BIT3; // input
+  	P2REN |= BIT3;   // this line and the next 
+  	P2OUT |= BIT3;   // enable the pullup resister
+  	*/
+}
+
+//ADS1230IPW
+/*
+ * ADS_CK		P1.2
+ * ADS_D		P1.1
+ * ADS_EN		P1.3
+ * 
+ */
+inline void init_ex_adc(void){
+
+  	P1DIR |= BIT2 | BIT3 ;    // output direction
+  	P1OUT |= BIT2 + BIT3;     // enable the pullup resister
+  	P1SEL &= ~(BIT2 + BIT3 ); // select as I / O function
+  	P1OUT |= BIT3;           // Hold nPDWN low
+  	P1OUT &= ~BIT2;
+  	
+  	P1DIR &=~ BIT1; 	  // ads_Dout input direction
+  	P1IES |= BIT1;        // interrupt falling
+  	P1REN |= BIT1; 		  // this line and the next 
+  	P1OUT |= BIT1; 		  // enable the pullup resister
+  	P1SEL &= ~BIT1; 	  // select as I / O function	
+}
+/*
+ * GDO0  P2.2
+ * GDO2  P2.5
+ * CSN   P3.0
+ */
+ inline void init_cc1101_gpio(void){
+ 	P2IES &= (BIT2 + BIT5); // IES = 0 ,上升沿设定IFG标志
+  	P2DIR &= ~(BIT2 + BIT5); 
+  	//CS
+  	P3DIR |= BIT0;
+  	P3OUT |= BIT0; 	
+ }
+ inline void init_beep(void){
+ 	P2DIR |= BIT4;    // output direction
+  	P2OUT &= ~BIT4;     // enable the pullup resister
+ 	
+ }
+/* MOSI  P3.1
+ * MISO  P3.2
+ * SCLK	 P3.3
+*/
+inline void init_spi(void){
+	
+	P3DIR |= (BIT1 + BIT3);
+  	P3OUT |= (BIT1 + BIT3);
+  	
+  	P3DIR &=  ~BIT2;
+  /*P3SEL |= 0x0E;                            // P3.1,2,3 USCI_A0 option select
+  P3DIR |= BIT1 + BIT3;
+  UCB0CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC;  // 3-pin, 8-bit SPI master
+  UCB0CTL1 |= UCSSEL_2;                     // SMCLK
+  UCB0BR0 |= 0x02;
+  UCB0BR1 = 0;
+  UCB0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine***/
+}
+
+inline void init_adc(void){
+   ADC10CTL0 = SREF_1 + ADC10SHT_3 + REF2_5V + REFON + ADC10ON;
+   ADC10CTL1 = INCH_0 + ADC10SSEL_3 +CONSEQ_0;  // A0,SMCLK
+  ADC10AE0 |= 0x01;                         // P2.0 ADC option select
+}
+inline void init_wdt(void){
+  WDTCTL = WDT_ADLY_1000;                   // WDT 8s interval timer
+  IE1 |= WDTIE;                             // Enable WDT interrupt
+}
+inline void disable_wdt_interrupt(void){
+	IE1 &= ~WDTIE;                             // Enable WDT interrupt
+}
+inline void enable_wdt_interrupt(void){
+	IE1 |= WDTIE;
+}
+
+inline void InitUCA0(void)
+{
+	P3SEL |= BIT4 + BIT5;                     // P3.4,5 = USCI_A0 TXD/RXD
+	
+	UCA0CTL1 |= UCSSEL_2;                     // SMCLK
+  	UCA0BR0 = 208;                              // 1MHz 8 =115200， 26 -> 38400, 8Mhz 208-->38400
+  	UCA0BR1 = 0;                              // 1MHz 115200
+  	UCA0MCTL = UCBRS2 + UCBRS0;               // Modulation UCBRSx = 5
+  	UCA0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine**
+  	//IE2 |= UCA0TXIE;                         // Enable USCI_A0 RX interrupt
+}
+#endif /*DRIVERSINIT_H_*/

@@ -1,0 +1,204 @@
+#include "rfsend.h"
+#include "define.h"
+#include "task.h"
+#include "flash.h"
+#include "timer_a.h"
+
+INT8U   bPacketRcv           = 0;
+INT8U   bHeartBeat           = 0;
+INT8U   bNeedCalibrate       = 0;
+INT8U   bNeedConfig          = 0;
+INT8U   bStart               = 0;
+INT8U   bStop                = 0;
+INT8U   bRun                 = 0;
+INT8U 	b_node_configured    = 0;
+
+extern volatile INT8U ADS1230_notified_flag ;
+extern struct WEIGHT_STRUCT weight_def;
+extern int   weight;
+INT16U weight_test;
+
+static void read_configured_data_from_flash(void){
+	INT8U temp[6] = {0};
+	INT8U calibrated_flag = 0;
+	//保护，如果读取内容不争取，如何处理 todo
+	/*ReadFlash(CTU_Addr, temp, 5);  
+    if(temp[0] == FLASH_VALID){
+	    MyId = temp[1] << 8;
+	    MyId |= temp[2];
+	    MyChannel = temp[3];
+	    if(MyChannel == 0){
+	    	LED_ALARM_ON;
+	    	WEIHGT_LED_3_ON();
+	    }
+	    b_node_configured = temp[4];
+	    if(b_node_configured == 0){
+	    	LED_ALARM_ON;
+	    	WEIHGT_LED_2_ON();
+	    }
+    }
+    else{
+    	LED_ALARM_ON;
+	    WEIHGT_LED_2_ON();
+	    WEIHGT_LED_3_ON();
+    }*/
+    
+    ReadFlash(ADS_ADDR0G, temp, 3);
+    if(temp[0] == FLASH_VALID){
+    	calibrated_flag = 1;
+	    weight_def.zero_calibrated_value = temp[1] << 8;
+	    weight_def.zero_calibrated_value |= temp[2];
+    }
+	ReadFlash(ADS_ADDR500G, temp, 3);
+    if(temp[0] == FLASH_VALID){
+    	calibrated_flag = 2;
+	    weight_def.half_kilo_calibrated_value = temp[1] << 8;
+	    weight_def.half_kilo_calibrated_value |= temp[2];
+    }
+    if(calibrated_flag == 2){
+    	weight_def.weight_ratio = 
+    	( weight_def.half_kilo_calibrated_value - weight_def.zero_calibrated_value)/500 ;
+    	weight_def.offset_value = 0.05;
+    	LED_ALARM_OFF;
+    }
+    else{
+    	LED_ALARM_ON;
+    	WEIHGT_LED_1_ON();
+    }
+}
+
+void init_drivers(void)
+{
+	_DINT(); 
+  	InitSysClk(); //1MHZ
+   	InitTimerA();// why need 2 timer? todo
+  	//InitTimerB();
+  	InitP1();
+  	InitP2P3();
+  	InitP4();  	
+  	LED_ALARM_ON;
+	
+	PowerUpResetCC1101();
+	delay(200);
+	halRfWriteRfSettings();
+	delay(20);
+		
+	read_configured_data_from_flash();
+	
+	P1OUT |= BIT3; 						 // release PDWN to allow normal operation of ads1230
+    P1IE  |= BIT1 + BIT4 + BIT5 + BIT6;  // enable buttons and swithcer interrupt
+    P2IE  |= BIT5 ;						//+ BIT2; // enable RF receiving interrupt
+	_EINT();
+}
+
+void delay_time(INT16U delay)
+{
+	INT16U i, j ;
+	
+	for(i = 0; i < delay; i++){
+	
+		for(j = 345; j > 0; j--);	
+	}	
+}
+#define HIGHT_FREQ_POINT 10
+INT8U do_sweep_freq(void){
+	// todo 全频点扫描通信，选择通信成功的频点，保存
+	/*
+	static ulong sweep_tick_time;
+	static INT8U freq_seq;
+	
+	if(timeout(sweep_tick_time, 20){
+		freq_seq++;
+		if(freq_seq > HIGHT_FREQ_POINT)
+		setting_freq(freq_seq);
+		while(!cc1101_reset_ok);
+		SendConfigRequest();
+		sweep_tick_time = local_ticktime();
+	}
+	*/
+	SendConfigRequest();
+	return 1;	
+}
+void test_local_led(void){
+	static ulong led_time_tick;
+	static INT8U led_status;
+	
+	if(timeout(led_time_tick, 10)){
+		if(led_status == 0){
+			led_status = 1;
+			LED_WEIGHT_ON_1;
+		}
+		else{
+			led_status = 0;
+			LED_WEIGHT_ON_0;
+		}
+			
+		led_time_tick = local_ticktime();
+	}
+}
+int main(void)
+{
+	INT8U    rbuf[MSG_LEN] = {0};
+	INT8U    rlen;
+	
+  	WDTCTL = WDTPW + WDTHOLD; // Stop watchdog timer
+  	
+	init_drivers();
+	
+	ADS1230_notified_flag = 0;
+   	ADS_DOUT_INT_E;  			// enable interrupt of P1.1
+	while( !ADS1230_notified_flag); // todo timeout
+	ads1230_start_calibrate();
+	
+	TIMER_A_START;  // start a timer
+	__bis_SR_register_on_exit(LPM3_bits);
+	BEEP_ON;
+	
+	while(1)
+	{
+		
+		test_local_led();
+		//床位配置成功
+		 if(b_node_configured == 1){ 	
+			if (IsSet(bHeartBeat)){
+				CLR_FLG(bHeartBeat);
+				if (IsSet(bRun)){
+					Run();
+				}
+				HeartBeat();
+			}
+			if (IsSet(bStart)){
+				Start();
+				CLR_FLG(bStart);
+			}
+			
+			if (IsSet(bStop)){
+				Stop();
+				CLR_FLG(bStop);
+			}
+		}
+		
+		if(IsSet(bPacketRcv)){
+			CLR_FLG(bPacketRcv);
+			rlen = sizeof(rbuf);
+			if(halRfReceivePacket(rbuf, &rlen)){
+				ProcessRcvdPacket(rbuf, rlen);
+			}
+
+		    memset(rbuf, 0, MSG_LEN);
+		}
+		//  长按K1 --tested
+		if (IsSet(bNeedCalibrate)){
+			CLR_FLG(bNeedCalibrate);
+			ads1230_Calibrate();//todo 容器校准 
+		}
+		// 配置床号， 长按K2
+		if (IsSet(bNeedConfig)) { 
+			if(do_sweep_freq() == 1){
+				CLR_FLG(bNeedConfig);
+				b_node_configured = 1;
+			}
+		}
+		//__bis_SR_register_on_exit(LPM3_bits);
+	}
+}

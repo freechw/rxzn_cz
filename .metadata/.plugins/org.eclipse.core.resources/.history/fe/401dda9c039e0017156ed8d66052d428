@@ -1,0 +1,325 @@
+#include "define.h"
+#include "task.h"
+#include "flash.h"
+#include "timer_b.h"
+#include "driversInit.h"
+#include "stdlib.h"
+#include "cc1101.h"
+
+volatile INT8U wdt_times_cnt = 0;
+static  ulong req_ack_tick_time;
+INT8U   wakeUp_from_wdt = 0;
+INT8U   re_try_times = 0;
+INT8U   channel_freq_num     = 0;
+INT8U   channel_getted       = 0;
+INT8U   bPacketRcv           = 0;
+INT8U   bNeedCalibrate       = 0;
+INT8U   bNeedConfig          = 0;
+INT8U 	b_node_configured    = 0;
+INT8U   bStart               = 0;
+INT8U   bStop                = 0;
+INT8U   bRun                 = 0;
+INT8U   ContainerType_change  = 0;
+
+extern volatile INT8U ADS1230_notified_flag ;
+extern struct WEIGHT_STRUCT weight_def;
+
+static void read_configured_data_from_flash(void){
+	INT8U temp[6] = {0};
+	INT8U calibrated_flag = 0;
+	
+	//保护，如果读取内容不争取，如何处理 ,多次读取flash//todo
+	ReadFlash(CTU_Addr, temp, 5);  
+    if(temp[0] == FLASH_VALID){
+	    MyId = temp[1];
+	    MyId = (MyId<< 8) + temp[2];
+	    MyChannel = temp[3];
+	    b_node_configured = temp[4];
+    }
+ 
+    ReadFlash(ADS_ADDR0G, temp, 4);
+    if(temp[0] == FLASH_VALID){
+    	calibrated_flag = 0x05;
+	    weight_def.zero_calibrated_value = temp[1];
+	    weight_def.zero_calibrated_value =  (weight_def.zero_calibrated_value << 8) + temp[2];
+	    weight_def.zero_calibrated_value =  (weight_def.zero_calibrated_value << 8) + temp[3];
+    }
+	ReadFlash(ADS_ADDR500G, temp, 4);
+    if(temp[0] == FLASH_VALID){
+    	calibrated_flag |= 0x50;
+	    weight_def.half_kilo_calibrated_value = temp[1] ;
+	    weight_def.half_kilo_calibrated_value = (weight_def.half_kilo_calibrated_value << 8)+ temp[2];
+	    weight_def.half_kilo_calibrated_value = (weight_def.half_kilo_calibrated_value << 8) + temp[3];
+    }
+    if(calibrated_flag == 0x55){
+    	if(weight_def.half_kilo_calibrated_value > weight_def.zero_calibrated_value){
+    		weight_def.weight_ratio =(weight_def.half_kilo_calibrated_value - weight_def.zero_calibrated_value) / 500;
+  			weight_def.offset_value = WEIGHT_SENSOR_OFFSET;
+    	}	
+    }
+}
+
+void init_drivers(void){
+	_DINT(); 
+  	InitSysClk(); //1MHZ
+  	read_configured_data_from_flash();
+  	init_led();
+  	init_button();
+  	init_ex_adc();
+  	init_beep();
+  	init_adc();
+  	InitUCA0();
+   	InitTimerA(); 
+  	InitTimerB();
+	init_cc1101();	
+ 	//init_wdt();
+	_EINT();
+	ads1230_start_calibrate();
+}
+
+void bond_led_indicate(void){
+	static ulong cal_time_tick;
+	static INT8U led_status = 0;
+	
+	if(timeout(cal_time_tick, 500)){
+		if(led_status == 0){
+			led_status = 1;
+			if(LED_SWITCH_ON)
+			LED_WEIGHT_ON_6;
+		}
+		else {
+			led_status = 0;
+			LED_WEIGHT_ON_0;
+		}
+		cal_time_tick = local_ticktime();
+	}
+}
+void bond_success_indicate(void){
+	INT8U tbuf[5];
+	tbuf[0] = 0x55;
+	tbuf[1] = (INT8U)(MyId >>8);
+	tbuf[2] = (INT8U)MyId;
+	tbuf[3] = MyChannel;
+	tbuf[4] = b_node_configured;
+	
+	(void)WriteFlash(CTU_Addr, tbuf, sizeof(tbuf));
+	if(LED_SWITCH_ON)
+		LED_WEIGHT_ON_6;
+	beep_beep();
+	Delay_nms(300);
+	beep_beep();
+	Delay_nms(300);
+	LED_WEIGHT_ON_0;	
+}
+
+void bond_failed_indicate(void){
+	LED_WEIGHT_ON_0;
+	beep_beep();
+	Delay_nms(300);
+	beep_beep();
+	Delay_nms(300);
+	beep_beep();
+	Delay_nms(300);
+	beep_beep();	
+}
+
+INT8U sweep_freq_ask(void){
+	static ulong sweep_tick_time;
+	
+	if(timeout(sweep_tick_time, 1000)){
+		if(channel_freq_num < MAX_CHANNEL_NUM){
+			usart_send_bytes(&channel_freq_num, 1);
+			cc1101_set_channel(channel_freq_num);
+			send_freq_get_request();				
+		}
+		else{
+			channel_freq_num = 0;
+			return 1;
+		}
+		channel_freq_num++;
+		sweep_tick_time = local_ticktime();
+	}
+	return 0;
+}
+
+void reset_req_ack_tickTime(void){
+	req_ack_tick_time = 0;	
+}
+
+#define MAX_DEV_REQ_TIMES 2
+#define BOND_WAIT_TIME  30000
+INT8U dev_request(void){
+	if(re_try_times <= MAX_DEV_REQ_TIMES){
+		if(timeout(req_ack_tick_time, BOND_WAIT_TIME)){
+			SendConfigRequest();
+			re_try_times++;
+			req_ack_tick_time = local_ticktime();
+		}
+	}
+	else{
+		re_try_times = 0;
+		return 1;	
+	}
+	return 0;
+}
+
+void enter_lp_mode(void){
+	LedAllSwitchOff();
+	CC1101SetIdle();
+	TIMER_B_STOP;
+	TIMER_A_STOP;
+	ADS_DOUT_INT_D;
+	RF_GDO0_INT_D;
+	init_wdt();
+	__bis_SR_register(LPM3_bits + GIE);     // Enter LPM3, enable interrupts*/
+}
+void quit_lp_mode(void){
+	TIMER_B_START;
+	RF_GDO0_INT_E;
+	//LED_ALARM_ON;  	
+}
+void quit_config(void){
+	bond_failed_indicate();
+	CLR_FLG(bNeedConfig);
+	enter_lp_mode();
+}
+void weighter_cal_op(void){
+	ads1230_Calibrate();
+	enter_lp_mode();
+}
+void ContainerType_change_op(void){
+	if (ContainerType == BAG){
+   		ContainerType = BOTTLE;
+   		LED_TYPE_BAG_OFF;
+   		LED_TYPE_BOTTLE_ON();
+   	}else{
+   		ContainerType = BAG;
+   		LED_TYPE_BAG_ON();
+   		LED_TYPE_BOTTLE_OFF;
+	}
+	Delay_nms(1000);
+	enter_lp_mode();
+}
+void band_op(void){
+	bond_led_indicate();
+	if(channel_getted == 0){
+		if(sweep_freq_ask()){
+			quit_config();	
+		}
+	}else{
+		if(dev_request()){
+			quit_config();	
+		}
+	}
+}
+void start_op(void){
+	if(b_node_configured == 1){
+		Start();
+		SET_FLG(bRun);
+	}
+	beep_beep();
+	enter_lp_mode();
+}
+void stop_op(void){
+	if(b_node_configured == 1){
+		Stop();
+		CLR_FLG(bRun);
+   	}
+	beep_beep();
+	ContainerType = BAG;
+	enter_lp_mode();
+}
+void wdt_wakeup_op(void){
+	if((b_node_configured == 1)){
+		if(IsSet(bRun)){ 
+			Run();
+			CC1101SetIdle();
+			Delay_nms(500);
+		}else{
+			HeartBeat();
+		}
+	}
+	enter_lp_mode();
+}
+void process_rf_op(void){
+	INT8U    rbuf[MSG_LEN] = {0}; 
+	INT8U    rlen;
+	
+	rlen = CC1101RecPacket(rbuf);
+	if(rlen){
+		usart_send_bytes(rbuf, rlen);
+		switch (ProcessRcvdPacket(rbuf, rlen))
+		{
+			case 1: // channel right
+				MyChannel = channel_freq_num;
+				channel_freq_num = 0;
+				channel_getted = 1;
+				reset_req_ack_tickTime();
+				break;
+			case 2:// bed bond ok
+				b_node_configured = 1;
+				reset_req_ack_tickTime();
+				re_try_times = 0;
+				CLR_FLG(bNeedConfig);
+				init_wdt();
+				bond_success_indicate();
+				enter_lp_mode();
+				break;
+			default:
+				break;	
+		}
+	}
+    CC1101SetTRMode( RX_MODE );
+}
+int main(void){
+	
+    disable_wdt(); 
+	init_drivers();	
+ 	enter_lp_mode();
+	while(1){	
+	 	//  称重校准 长按K1
+		if (IsSet(bNeedCalibrate)){
+			CLR_FLG(bNeedCalibrate);
+			weighter_cal_op();
+		}
+		// 短按 选择输液袋类型 K1 按键
+		if(IsSet(ContainerType_change)){
+			CLR_FLG(bNeedCalibrate);
+			ContainerType_change_op();	
+		}
+		// 配置床号， 长按K2
+		if (IsSet(bNeedConfig) ){ 
+			band_op();
+		}
+		//短按 K2 进行start 和stop切换	
+		if (IsSet(bStart)){
+			CLR_FLG(bStart);
+			start_op();
+		}else if (IsSet(bStop)){
+		   	CLR_FLG(bStop);
+		   	stop_op();
+		}
+		//20s 唤醒
+		if(wakeUp_from_wdt == 1){
+			wakeUp_from_wdt = 0;
+			wdt_wakeup_op();
+		}	
+		//无线数据接收
+		if(IsSet(bPacketRcv)){
+			CLR_FLG(bPacketRcv);
+			process_rf_op();
+		}
+	}
+}
+//4s周期 WDT
+#pragma vector = WDT_VECTOR
+__interrupt void watchdog_timer(void){
+	wdt_times_cnt++;
+	if(wdt_times_cnt >= 5){
+		wdt_times_cnt = 0;
+		wakeUp_from_wdt = 1;
+		quit_lp_mode();
+		__bic_SR_register_on_exit(LPM3_bits);
+	}
+}
+

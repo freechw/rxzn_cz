@@ -1,0 +1,979 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="DialogBounds_SearchDialog">
+		<item key="DIALOG_X_ORIGIN" value="635"/>
+		<item key="DIALOG_FONT_NAME" value="1|微软雅黑|9|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|微软雅黑"/>
+		<item key="DIALOG_HEIGHT" value="510"/>
+		<item key="DIALOG_Y_ORIGIN" value="185"/>
+		<item key="DIALOG_WIDTH" value="669"/>
+	</section>
+	<section name="SearchDialog.ScopePart">
+		<item key="scope" value="0"/>
+	</section>
+	<section name="Search">
+		<list key="Search.enabledPageIds">
+			<item value="org.eclipse.search.internal.ui.text.TextSearchPage"/>
+		</list>
+		<list key="Search.processedPageIds">
+			<item value="org.eclipse.search.internal.ui.text.TextSearchPage"/>
+		</list>
+	</section>
+	<section name="DialogBounds_ReplaceDialog2">
+		<item key="DIALOG_X_ORIGIN" value="726"/>
+		<item key="DIALOG_HEIGHT" value="308"/>
+		<item key="DIALOG_FONT_NAME" value="1|微软雅黑|9|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|微软雅黑"/>
+		<item key="DIALOG_Y_ORIGIN" value="320"/>
+		<item key="DIALOG_WIDTH" value="487"/>
+	</section>
+	<section name="ReplaceDialog2">
+		<list key="replace_with">
+			<item value="LED_STATUS_BLINK"/>
+		</list>
+	</section>
+	<section name="TextSearchPage">
+		<item key="HISTORY_SIZE" value="12"/>
+		<item key="SEARCH_DERIVED" value="false"/>
+		<item key="CASE_SENSITIVE" value="false"/>
+		<item key="REG_EX_SEARCH" value="false"/>
+		<section name="HISTORY4">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="halSpiWriteBurstReg"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY9">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="halSpiReadBurstReg"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY0">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="halWait"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.s55"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.c64"/>
+				<item value="*.tci"/>
+				<item value="*.S"/>
+				<item value="*.h43"/>
+				<item value="*.exe"/>
+				<item value="*.ent"/>
+				<item value="*.c++"/>
+				<item value="*.hpp"/>
+				<item value="*.sa"/>
+				<item value="*.cxx"/>
+				<item value="*.c62"/>
+				<item value="*.TCF"/>
+				<item value="*.obj"/>
+				<item value="*.s??"/>
+				<item value="*.cc"/>
+				<item value="*.xs"/>
+				<item value="*.cfg"/>
+				<item value="*.html"/>
+				<item value="*.s43"/>
+				<item value="*.macrodef"/>
+				<item value="*.s"/>
+				<item value="*.dylib"/>
+				<item value="*.htm"/>
+				<item value="*.c67"/>
+				<item value="*.txt"/>
+				<item value="*.bld"/>
+				<item value="*.hxx"/>
+				<item value="*.c55"/>
+				<item value="*.xml"/>
+				<item value="*.xdc"/>
+				<item value="*.h55"/>
+				<item value="*.tcf"/>
+				<item value="*.hh"/>
+				<item value="*.xdt"/>
+				<item value="*.CFG"/>
+				<item value="*.so"/>
+				<item value="*.h??"/>
+				<item value="*.s64"/>
+				<item value="*.mk"/>
+				<item value="*.out"/>
+				<item value="*.ccxml"/>
+				<item value="*.o"/>
+				<item value="*.map"/>
+				<item value="*.opt"/>
+				<item value="*.c??"/>
+				<item value="*.s67"/>
+				<item value="*.ld"/>
+				<item value="*.cpp"/>
+				<item value="*.CMD"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.dll"/>
+				<item value="*.C"/>
+				<item value="*.c"/>
+				<item value="*.s62"/>
+				<item value="*.h"/>
+				<item value="*.h62"/>
+				<item value="*.shtml"/>
+				<item value="*.pjt"/>
+				<item value="*.c43"/>
+				<item value="*.ASM"/>
+				<item value="*.lib"/>
+				<item value="*.cmd"/>
+			</list>
+		</section>
+		<section name="HISTORY2">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="halSpiReadStatus"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY5">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="halSpiReadReg"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY10">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="halSpiStrobe"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY7">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="halSpiWriteReg"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY3">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="Delay5ms"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY11">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="SpiInit"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY1">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="PaTabel"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY6">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="USART_Init"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+		<section name="HISTORY8">
+			<item key="isRegExSearch" value="false"/>
+			<item key="scope" value="0"/>
+			<item key="ignoreCase" value="false"/>
+			<item key="textPattern" value="R_S_Byte"/>
+			<list key="workingSets">
+			</list>
+			<list key="fileNamePatterns">
+				<item value="*.ASM"/>
+				<item value="*.C"/>
+				<item value="*.CFG"/>
+				<item value="*.CMD"/>
+				<item value="*.S"/>
+				<item value="*.TCF"/>
+				<item value="*.a"/>
+				<item value="*.asm"/>
+				<item value="*.bld"/>
+				<item value="*.c"/>
+				<item value="*.c++"/>
+				<item value="*.c43"/>
+				<item value="*.c55"/>
+				<item value="*.c62"/>
+				<item value="*.c64"/>
+				<item value="*.c67"/>
+				<item value="*.c??"/>
+				<item value="*.cc"/>
+				<item value="*.ccxml"/>
+				<item value="*.cfg"/>
+				<item value="*.cmd"/>
+				<item value="*.cpp"/>
+				<item value="*.cxx"/>
+				<item value="*.dll"/>
+				<item value="*.dylib"/>
+				<item value="*.ent"/>
+				<item value="*.exe"/>
+				<item value="*.h"/>
+				<item value="*.h43"/>
+				<item value="*.h55"/>
+				<item value="*.h62"/>
+				<item value="*.h64"/>
+				<item value="*.h67"/>
+				<item value="*.h??"/>
+				<item value="*.hh"/>
+				<item value="*.hpp"/>
+				<item value="*.htm"/>
+				<item value="*.html"/>
+				<item value="*.hxx"/>
+				<item value="*.ld"/>
+				<item value="*.lib"/>
+				<item value="*.macrodef"/>
+				<item value="*.map"/>
+				<item value="*.mk"/>
+				<item value="*.o"/>
+				<item value="*.obj"/>
+				<item value="*.opt"/>
+				<item value="*.out"/>
+				<item value="*.pjt"/>
+				<item value="*.prefs"/>
+				<item value="*.properties"/>
+				<item value="*.s"/>
+				<item value="*.s43"/>
+				<item value="*.s55"/>
+				<item value="*.s62"/>
+				<item value="*.s64"/>
+				<item value="*.s67"/>
+				<item value="*.s??"/>
+				<item value="*.sa"/>
+				<item value="*.shtml"/>
+				<item value="*.so"/>
+				<item value="*.tcf"/>
+				<item value="*.tci"/>
+				<item value="*.txt"/>
+				<item value="*.xdc"/>
+				<item value="*.xdt"/>
+				<item value="*.xml"/>
+				<item value="*.xs"/>
+			</list>
+		</section>
+	</section>
+	<section name="org.eclipse.cdt.ui.pdomSearchViewPage">
+	</section>
+	<section name="org.eclipse.search.text.FileSearchResultPage">
+	</section>
+</section>

@@ -1,0 +1,410 @@
+#include "msp430f2272.h"
+#include "rfsend.h"
+#include "Define.h"
+#include "task.h"
+#include "Uart_flashwrite.h"
+
+/*
+ * global variables
+ */
+eContainerType  ContainerType        = BOTTLE;
+INT8U           BlinkIntvCnt         = 0;
+
+INT16U          CTUint;  //称重器编号
+
+INT16U   packno;    //信号发送序号
+INT8U    TimeOverCount;   //定时器溢出次数，用于15S,20S发送心跳
+INT8U    WorkStat=SYS_SLEEP;        //工作状态
+
+INT8U    LedSwitchOff = 0;  
+      
+INT16U   WEIGHT;
+INT8U    rfCHANNR=37;               //本机频点
+INT16U   configCount;        //配置床号计时，与TimeOverCount连用，间隔发请求配置包
+
+INT8U    sleepCount=0;            //
+
+/*
+ * local variables
+ */
+
+/*
+ * local functions go here
+ */
+
+static void SendPacket(INT8U *buf, INT8U len)
+{
+	INT8U  tbuf[MSG_LEN] = {0};
+	INT8U  i;
+	
+	tbuf[2] = HEAD_H;
+	tbuf[3] = HEAD_L;
+	tbuf[4] = 0x3b;
+	
+	for(i=5 ; i < (len + 5); i++)
+	{
+		tbuf[i] = buf[i-5];
+	}
+	
+	for(i = 0; i < MSG_LEN - 1; i++)
+	{
+		tbuf[MSG_LEN - 1] += tbuf[i];
+	}
+	
+    halRfSendPacket(tbuf, MSG_LEN);
+    
+    SendBlink();
+}
+
+static void WeightBlink(INT16U weight)
+{
+	INT16U TW = WEIGHT / 7;
+	
+	if(weight > TW * 6)
+	{
+	   LED51;
+	   LED41;
+	   LED31;
+	   LED21;
+	   LED11;
+	   LED01;
+	}
+	else if(weight > TW * 5)
+	{
+	   LED50;
+	   LED41;
+	   LED31;
+	   LED21;
+	   LED11;
+	   LED01;
+	}
+	else if(weight > TW * 4)
+	{
+	   LED50;
+	   LED40;
+	   LED31;
+	   LED21;
+	   LED11;
+	   LED01;
+	}
+	else if(weight > TW * 3)
+	{
+	   LED50;
+	   LED40;
+	   LED30;
+	   LED21;
+	   LED11;
+	   LED01;
+	}
+	else if(weight > TW * 2)
+	{
+	   LED50;
+	   LED40;
+	   LED30;
+	   LED20;
+	   LED11;
+	   LED01;
+	}
+	else if(weight > TW * 1)
+	{
+	   LED50;
+	   LED40;
+	   LED30;
+	   LED20;
+	   LED10;
+	   LED01;
+	}
+	else
+	{
+	   LED50;
+	   LED40;
+	   LED30;
+	   LED20;
+	   LED10;
+	   LED00;
+	}
+}
+
+static void start_data()
+{
+	INT16U weight;
+	INT8U  tbuf[MSG_LEN];
+	
+	WEIGHT=weight=ADS1230();
+	tbuf[0]=START;
+	tbuf[1]=CTUint>>8;
+	tbuf[2]=CTUint;
+	tbuf[3]=weight>>8;
+	tbuf[4]=weight;
+	tbuf[5]=ContainerType;
+	tbuf[6]=0;
+	SendPacket(tbuf, MSG_BODDY_LEN);
+	packno=1;
+	WorkStat=RUN;
+	TimeOverCount=0;
+	configCount=0;
+}
+
+static void run_data()
+{
+	INT16U weight;
+	INT8U  tbuf[MSG_LEN];
+
+	weight=ADS1230();
+	tbuf[0]=RUN;
+	tbuf[1]=CTUint>>8;
+	tbuf[2]=CTUint;
+	tbuf[3]=weight>>8;
+	tbuf[4]=weight;
+	tbuf[5]=packno>>8;
+	tbuf[6]=packno;
+	SendPacket(tbuf, MSG_BODDY_LEN);
+	packno++;
+	WeightBlink(weight);
+    //bottleBlink();
+    Delay_ms(5);
+    tbuf[0]=BEAT;
+	tbuf[1]=CTUint>>8;
+	tbuf[2]=CTUint;
+	tbuf[3]=0;
+	tbuf[4]=0;
+	tbuf[5]=0;
+	tbuf[6]=0;
+	SendPacket(tbuf, MSG_BODDY_LEN);
+    TimeOverCount=0;
+}
+
+static void stop_data()
+{
+	INT8U  tbuf[MSG_LEN];
+	
+	tbuf[0]=STOP;
+	tbuf[1]=CTUint>>8;
+	tbuf[2]=CTUint;
+	tbuf[3]=0;
+	tbuf[4]=0;
+	tbuf[5]=0;
+	tbuf[6]=0;
+	SendPacket(tbuf, MSG_BODDY_LEN);
+	WorkStat=SYS_SLEEP;
+	sleepCount=0;
+}
+
+/************************************************
+ * 配置称重器，定时调用halSpiWriteReg函数更新频点
+ * 如果已经一轮频点已经发完仍未收到回复，退出配置
+ * 配置过程中信号灯闪烁
+ * ********************************************/
+static void configUnit()
+{
+	INT8U  tbuf[MSG_LEN];
+	INT8U  TC;
+	
+	TC=TimeOverCount-configCount;
+	if(TC!=0)
+	{
+		tbuf[0]=W_REG;
+		tbuf[1]=0;
+		tbuf[2]=0;
+		tbuf[3]=0;
+		tbuf[4]=0;
+		tbuf[5]=0;
+		tbuf[6]=0;
+		SendPacket(tbuf, MSG_BODDY_LEN);
+		halSpiWriteReg(CCxxx0_CHANNR,rfCHANNR);
+		configCount=TimeOverCount;
+		P4OUT ^= BIT3;
+		rfCHANNR++;
+		if(rfCHANNR==68)
+		{
+			rfCHANNR=37;
+		}
+		
+	}
+}
+
+/*
+ * APIs go here
+ */
+void switch_stat()
+{
+	switch(WorkStat)
+	{
+	case START:
+	   {
+	   	   start_data();
+	   }
+	   break; 
+	case RUN:
+	   {
+	   	   run_data(); 
+	   }
+	   break;
+	case STOP:
+	   {
+	   	   stop_data();
+	   }
+	   break;
+	case  W_REG:
+   	   {
+   	       configUnit();
+   	   }
+   	   break;
+	default :
+	   break;	
+	}
+}
+
+/************************************************
+ * 读取ADS1230转换结果，copy自张工
+ * 20位只用了16位
+ * *********************************************/
+unsigned int ADS1230(void)
+{
+	int temp;
+	
+	for(int i=0;i<21;i++)
+	{
+		P1OUT&=~BIT2;
+		delay(20);
+		P1OUT|=BIT2;
+		delay(1);
+		temp<<=1;
+		if(P1IN&BIT1)
+		  temp++;
+		delay(5);
+		P1OUT&=~BIT2;
+	}	
+	temp>>=1;
+	return temp;
+}
+
+static INT8U DoCalibrate(INT16U addr)
+{
+   int dat, temp;
+   unsigned char tbuf[3];
+   
+   	temp = ADS1230();
+   	
+   	dat = (int)((temp + 0x80000) & 0xFFFFF) - 0x80000;
+   	dat = (dat - 0x1e0);
+   	dat = dat / 16;
+   	dat = dat * 10;
+   	
+   	tbuf[0] = 0x55;
+   	tbuf[1] = dat>>8;
+   	tbuf[2] = dat;
+   	
+   	Write_Rom(addr, tbuf, 3);
+   	
+   	return 1;
+}
+
+void Calibrate(void)
+{
+  char i = 0;
+  
+  if(DIAL_SWITCH1_ON)  //0g
+  {
+      i = DoCalibrate();
+  }
+  else if(DIAL_SWITCH2_ON)  //500g
+  {
+  	  i = DoCalibrate(ADS_Addr500);
+  }
+  
+  if(i == 1)
+  {
+  	//BeepTwice();
+  	
+    LED01;
+    LED11;
+    LED21;
+    LED31;
+    LED41;
+    LED51;
+    
+    Delay_ms(50);
+    
+    LED00;
+    LED10;
+    LED20;
+    LED30;
+    LED40;
+    LED50;	
+  }
+}
+
+INT8U CheckRData(INT8U *rbuf)
+{
+	char i;
+	unsigned char tcrc=0;
+	
+	for(i=2;i<12;i++)
+	{
+		tcrc+=rbuf[i];
+	}
+	if(tcrc==rbuf[12])
+	   return YES;
+	else
+	   return NO;
+}
+
+void HeartBeat(void)
+{
+	INT8U tbuf[MSG_LEN] = {0};
+ 
+	tbuf[0] = BEAT;
+	tbuf[1] = CTUint >> 8;
+	tbuf[2] = CTUint;
+
+	SendPacket(tbuf, MSG_BODDY_LEN);
+}
+
+void CmdProcess(INT8U *rbuf)
+{
+	unsigned char task;
+	unsigned char tbuf[5];
+	
+	task = rbuf[5];
+	switch(task)
+	{
+	case W_REG:
+		{
+			tbuf[0] = 0x55;
+			tbuf[1] = rbuf[6];
+			tbuf[2] = rbuf[7];
+			tbuf[3] = rfCHANNR--;
+			if(tbuf[3] < 37)
+			{
+				tbuf[3]=37;
+			}
+			
+			Write_Rom(CTU_Addr,tbuf,3);
+			
+			WorkStat = BEAT;
+			
+			BeepTwice();
+			
+			LEDSign0;
+		}
+		break;
+		
+	case REV_ACK:
+		{
+
+		}
+		break;
+
+	default:
+		break;
+	}
+}
+
+void Sys_task()
+{
+    if((WorkStat == RUN) && !LedSwitchOff)
+    {
+       WeightBlink(ADS1230());
+    }
+}

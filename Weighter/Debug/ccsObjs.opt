@@ -1,0 +1,1 @@
+"./timer_b.obj" "./timer_a.obj" "./task.obj" "./spi.obj" "./p2_int.obj" "./p1_int.obj" "./main.obj" "./flash.obj" "./CC1101.obj" -l"libc.a" "../lnk_msp430f2272.cmd" 

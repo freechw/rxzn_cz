@@ -1,0 +1,11 @@
+#include "rfsend.h"
+#include "Define.h"
+#include "flash.h"
+
+int main(void) 
+{
+	while (1)
+	{
+		break;
+	}
+}

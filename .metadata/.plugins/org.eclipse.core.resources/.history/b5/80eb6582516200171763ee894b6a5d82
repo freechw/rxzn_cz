@@ -1,0 +1,142 @@
+//#include <stdio.h>
+//#include <assert.h>
+//#include <stdlib.h>
+//#include "msp430f2272.h"
+#include "rfsend.h"
+#include "Define.h"
+#include "task.h"
+#include "flash.h"
+
+/*******************************************************************************
+ *************************macros goes here**************************************
+ ******************************************************************************/
+
+/*******************************************************************************
+ **********************external variables go here*******************************
+ ******************************************************************************/
+INT8U   bPacketRcv           = 0;
+INT8U   bHeartBeat           = 0;
+INT8U   bNeedCalibrate       = 0;
+INT8U   bNeedConfig          = 0;
+INT8U   bStart               = 0;
+INT8U   bStop                = 0;
+INT8U   bRun                 = 0;
+
+/*******************************************************************************
+ **********************local variables go here**********************************
+ ******************************************************************************/
+
+/******************************************************************************/
+
+int main(void)
+{
+	INT8U    rbuf[MSG_LEN] = {0};
+	INT8U    rlen;
+	INT8U    temp[4];
+
+  	WDTCTL = WDTPW + WDTHOLD; // Stop watchdog timer
+  	
+	_DINT(); // diable interrupt
+  	
+  	InitSysClk();
+  	
+  	InitTimerA();
+  	
+  	InitTimerB();
+  	
+  	InitP1();
+  	
+  	InitP2();
+  	
+  	InitP3();
+  	
+  	InitP4();  	
+
+  	LED_ALARM_OFF;
+	
+	POWER_UP_RESET_CC1100();
+	
+	delay(200);
+	
+	halRfWriteRfSettings();
+	
+	delay(20);
+	
+	halSpiWriteBurstReg(CCxxx0_PATABLE, PaTabel, 8);
+	
+	delay(200);
+	
+	halSpiReadBurstReg(0x00, C11xxReg, 47);
+	
+	delay(20);
+		
+	P1OUT |= BIT3;  // release PDWN to allow normal operation of ads1230
+	P1OUT &= ~BIT2; // what's this for?
+    P1IE |= BIT4 + BIT5 + BIT6;  // enable buttons and swithcer interrupt
+    P2IE |= BIT5; // enable RF receiving interrupt
+    
+    ReadFlash(CTU_Addr, temp, sizeof(temp));
+    
+    if(temp[0] == 0x55)
+    {
+	    MyId = temp[1] << 8;
+	    MyId |= temp[2];
+	    MyChannel = temp[3];
+    }
+	
+	_EINT();  // enable interrupt
+	
+	while(1)
+	{
+		if (IsSet(bHeartBeat))
+		{
+			CLR_FLG(bHeartBeat);
+			
+			HeartBeat();
+		
+			if (IsSet(bRun))
+			{
+				Run();
+			}
+		}
+		
+		if(IsSet(bPacketRcv))
+		{
+			CLR_FLG(bPacketRcv);
+			
+			halRfReceivePacket(rbuf, &rlen);
+
+		    ProcessRcvdPacket(rbuf, rlen);
+		    	
+		    memset(rbuf, 0, MSG_LEN);
+		}
+		
+		if (IsSet(bNeedCalibrate))
+		{
+			CLR_FLG(bNeedCalibrate);
+			//HeartBeat(); // for test, will be removed
+			Calibrate();
+		}
+		
+		if (IsSet(bNeedConfig))
+		{
+			CLR_FLG(bNeedConfig);
+			//HeartBeat(); // for test, will be removed
+			SendConfigRequest();
+		}
+		
+		if (IsSet(bStart))
+		{
+			Start();
+			CLR_FLG(bStart);
+		}
+		
+		if (IsSet(bStop))
+		{
+			Stop();
+			CLR_FLG(bStop);
+		}
+		
+		__bis_SR_register_on_exit(LPM3_bits);
+	}
+}

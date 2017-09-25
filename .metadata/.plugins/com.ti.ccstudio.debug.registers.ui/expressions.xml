@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<States>
+<Expressions>
+<Expression IMemento.internal.id="sampled_data">
+<Format Class="com.ti.ccstudio.debug.registers.model.VariableFormat" Name="Hexadecimal"/>
+</Expression>
+<Expression IMemento.internal.id="version_pn">
+<Format Class="com.ti.ccstudio.debug.registers.model.VariableFormat" Name="Hexadecimal"/>
+</Expression>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[6]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[4]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[1]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[8]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[3]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[0]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[5]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[7]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[9]" Name="Hexadecimal"/>
+<VariableFormatMap Class="com.ti.ccstudio.debug.registers.model.VariableFormat" IMemento.internal.id="(sampled_data)[2]" Name="Hexadecimal"/>
+</Expressions>
+</States>

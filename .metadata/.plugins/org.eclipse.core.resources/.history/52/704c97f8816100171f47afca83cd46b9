@@ -1,0 +1,88 @@
+//#include "msp430f2272.h"
+#include "Define.h"
+#include "task.h"
+#include "interrupt.h"
+
+static INT8U   SKeyRole       = 0;
+static INT8U   FKeyPressCnt   = 0;
+static INT8U   SKeyPressCnt   = 0;
+
+//#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+#pragma vector=TIMERA0_VECTOR
+__interrupt void Timer_A (void)
+//#elif defined(__GNUC__)
+///void __attribute__ ((interrupt(TIMERA0_VECTOR))) Timer_A (void)
+//#else
+//#error Compiler not supported!
+//#endif
+{
+	if (FUNCT_BUTTON_DW)
+	{
+		if (++FKeyPressCnt >= L_PRESS_INTVL)
+		{
+			FKeyPressCnt = 0;
+			
+			SET_FLG(bNeedCalibrate);
+			
+			TIMER_A_STOP;
+			
+			__bic_SR_register_on_exit(LPM3_bits);
+		}
+	}
+	else if (START_BUTTON_DW)
+	{
+		if (SKeyPressCnt++ >= L_PRESS_INTVL)
+		{
+			SKeyPressCnt = 0;
+			
+			SET_FLG(bNeedConfig);
+			
+			TIMER_A_STOP;
+			
+			__bic_SR_register_on_exit(LPM3_bits);
+		}
+	}
+	else if (IsClr(ButtonIntSrc) && FUNCT_BUTTON_UP)
+	{
+		if (S_PRESS_INTVL <= FKeyPressCnt && FKeyPressCnt < L_PRESS_INTVL)
+		{
+			if (ContainerType == BAG)
+	   		{
+		   		ContainerType = BOTTLE;
+	   		}
+			else
+			{
+		   		ContainerType = BAG;
+		   		LED_STATUS_ON;
+			}
+			
+			TIMER_A_STOP;
+		}
+		else  // this is a signal jitter
+		{
+			FKeyPressCnt = 0;
+		}
+	}
+	else if (IsSet(ButtonIntSrc) && START_BUTTON_UP)
+	{
+		if (S_PRESS_INTVL <= SKeyPressCnt && SKeyPressCnt < L_PRESS_INTVL)
+		{
+			if (IsClr(SKeyRole))
+			{
+				SET_FLG(SKeyRole);
+				SET_FLG(bStart);
+			}
+			else
+			{
+				CLR_FLG(SKeyRole);
+				SET_FLG(bStop);
+			}
+			
+			TIMER_A_STOP;
+		}
+		else  // this is a signal jitter
+		{
+			SKeyPressCnt = 0;
+		}
+	}
+}

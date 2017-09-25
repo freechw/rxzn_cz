@@ -1,0 +1,764 @@
+******************************************************************************
+                  MSP430 Linker PC v3.3.1                      
+******************************************************************************
+>> Linked Thu Sep 21 20:22:27 2017
+
+OUTPUT FILE NAME:   <Weighter.out>
+ENTRY POINT SYMBOL: "_c_int00"  address: 00009b6c
+
+
+MEMORY CONFIGURATION
+
+         name            origin    length      used     unused   attr    fill
+----------------------  --------  ---------  --------  --------  ----  --------
+  SFR                   00000000   00000010  00000000  00000010  RWIX
+  PERIPHERALS_8BIT      00000010   000000f0  00000000  000000f0  RWIX
+  PERIPHERALS_16BIT     00000100   00000100  00000000  00000100  RWIX
+  RAM                   00000200   00000400  000000a7  00000359  RWIX
+  INFOD                 00001000   00000040  00000000  00000040  RWIX
+  INFOC                 00001040   00000040  00000000  00000040  RWIX
+  INFOB                 00001080   00000040  00000000  00000040  RWIX
+  INFOA                 000010c0   00000040  00000000  00000040  RWIX
+  FLASH                 00008000   00007fde  000020c0  00005f1e  RWIX
+  INT00                 0000ffe0   00000002  00000000  00000002  RWIX
+  INT01                 0000ffe2   00000002  00000000  00000002  RWIX
+  INT02                 0000ffe4   00000002  00000002  00000000  RWIX
+  INT03                 0000ffe6   00000002  00000002  00000000  RWIX
+  INT04                 0000ffe8   00000002  00000000  00000002  RWIX
+  INT05                 0000ffea   00000002  00000002  00000000  RWIX
+  INT06                 0000ffec   00000002  00000000  00000002  RWIX
+  INT07                 0000ffee   00000002  00000000  00000002  RWIX
+  INT08                 0000fff0   00000002  00000000  00000002  RWIX
+  INT09                 0000fff2   00000002  00000002  00000000  RWIX
+  INT10                 0000fff4   00000002  00000002  00000000  RWIX
+  INT11                 0000fff6   00000002  00000000  00000002  RWIX
+  INT12                 0000fff8   00000002  00000000  00000002  RWIX
+  INT13                 0000fffa   00000002  00000002  00000000  RWIX
+  INT14                 0000fffc   00000002  00000000  00000002  RWIX
+  RESET                 0000fffe   00000002  00000002  00000000  RWIX
+
+
+SECTION ALLOCATION MAP
+
+ output                                  attributes/
+section   page    origin      length       input sections
+--------  ----  ----------  ----------   ----------------
+.pinit     0    00008000    00000000     UNINITIALIZED
+
+.bss       0    00000200    00000057     UNINITIALIZED
+                  00000200    0000001e     main.obj (.bss)
+                  0000021e    0000001d     task.obj (.bss)
+                  0000023b    00000001     --HOLE--
+                  0000023c    0000000a     CC1101.obj (.bss)
+                  00000246    00000004     rts430.lib : _lock.obj (.bss)
+                  0000024a    00000004                : boot.obj (.bss)
+                  0000024e    00000004     timer_b.obj (.bss)
+                  00000252    00000003     timer_a.obj (.bss)
+                  00000255    00000002     p1_int.obj (.bss)
+
+.stack     0    000005b0    00000050     UNINITIALIZED
+                  000005b0    00000002     rts430.lib : boot.obj (.stack)
+                  000005b2    0000004e     --HOLE--
+
+.text      0    00008000    00001fcc     
+                  00008000    00000146     main.obj (.text:read_configured_data_from_flash__Fv)
+                  00008146    00000130     rts430.lib : fs_add.obj (.text)
+                  00008276    00000128     task.obj (.text:WeightLedFlush__FUi)
+                  0000839e    0000011e     timer_a.obj (.text:Timer_A__Fv)
+                  000084bc    000000ec     task.obj (.text:ads1230_sample_data__FPUlUcT2)
+                  000085a8    000000cc     CC1101.obj (.text:CC1101SendPacket__FPUcUc12TX_DATA_MODE)
+                  00008674    000000c6     CC1101.obj (.text:CC1101RecPacket__FPUc)
+                  0000873a    000000c2     p1_int.obj (.text:PORT1_ISR__Fv)
+                  000087fc    000000aa     task.obj (.text:ads1230_start_calibrate__Fv)
+                  000088a6    000000a2     main.obj (.text:bond_success_indicate__Fv)
+                  00008948    000000a2     main.obj (.text:main)
+                  000089ea    0000009e     task.obj (.text:ProcessRcvdPacket__FPUcUc)
+                  00008a88    0000009e     task.obj (.text:get_battery_value__Fv)
+                  00008b26    0000009a     rts430.lib : fs_div.obj (.text)
+                  00008bc0    00000092     task.obj (.text:ReadWeight__Fv)
+                  00008c52    0000008e     main.obj (.text:process_rf_op__Fv)
+                  00008ce0    0000008c     task.obj (.text:ads1230_DoCalibrate__FUi)
+                  00008d6c    00000088     flash.obj (.text:WriteFlash__FUiPUcUc)
+                  00008df4    00000086     task.obj (.text:SendPacket__FPUcUc)
+                  00008e7a    00000086     task.obj (.text:ads1230_Calibrate__Fv)
+                  00008f00    00000082     CC1101.obj (.text:CC1101Init__Fv)
+                  00008f82    00000082     task.obj (.text:ReadWeightSensor__Fv)
+                  00009004    00000080     main.obj (.text:bond_led_indicate__Fv)
+                  00009084    00000080     task.obj (.text:send_freq_get_request__Fv)
+                  00009104    00000080     task.obj (.text:weight_led__FUc)
+                  00009184    0000007e     task.obj (.text:Run__Fv)
+                  00009202    0000006a     task.obj (.text:calibrate_success_indicate__Fv)
+                  0000926c    00000066     timer_b.obj (.text:timeout__FUlT1)
+                  000092d2    00000064     p2_int.obj (.text:PORT2_ISR__Fv)
+                  00009336    00000062     task.obj (.text:HeartBeat__Fv)
+                  00009398    00000060     CC1101.obj (.text:CC1101ReadMultiReg__FUcPUcT1)
+                  000093f8    0000005e     task.obj (.text:Start__Fv)
+                  00009456    0000005c     rts430.lib : lsr32.obj (.text:l_lsr_const)
+                  000094b2    00000058                : div32u.obj (.text)
+                  0000950a    00000058     main.obj (.text:sweep_freq_ask__Fv)
+                  00009562    00000054     spi.obj (.text:SPI_ExchangeByte__FUc)
+                  000095b6    0000004e     main.obj (.text:bond_failed_indicate__Fv)
+                  00009604    00000048     CC1101.obj (.text:CC1101WriteMultiReg__FUcPUcT1)
+                  0000964c    00000048     task.obj (.text:cal_led_indicate__Fv)
+                  00009694    00000046     rts430.lib : autoinit.obj (.text:_auto_init)
+                  000096da    00000046                : fs_tou.obj (.text)
+                  00009720    00000040     main.obj (.text:dev_request__Fv)
+                  00009760    00000040     task.obj (.text:usart_send_bytes__FPUcUc)
+                  000097a0    0000003e     rts430.lib : lsl32.obj (.text:l_lsl_const)
+                  000097de    0000003c     CC1101.obj (.text:CC1101SetTRMode__F6TRMODE)
+                  0000981a    0000003c     task.obj (.text:Delay_nms__FUl)
+                  00009856    0000003c     main.obj (.text:init_drivers__Fv)
+                  00009892    0000003a     flash.obj (.text:ReadFlash__FUiPUcUc)
+                  000098cc    0000003a     task.obj (.text:ads_delay__FUi)
+                  00009906    00000038     main.obj (.text:init_button__Fv)
+                  0000993e    00000036     task.obj (.text:Stop__Fv)
+                  00009974    00000034     main.obj (.text:watchdog_timer__Fv)
+                  000099a8    00000032     CC1101.obj (.text:CC1101Reset__Fv)
+                  000099da    00000032     main.obj (.text:ContainerType_change_op__Fv)
+                  00009a0c    00000032     task.obj (.text:beep_beep__Fv)
+                  00009a3e    00000032     rts430.lib : fs_ultof.obj (.text)
+                  00009a70    00000030     main.obj (.text:init_ex_adc__Fv)
+                  00009aa0    00000030     main.obj (.text:wdt_wakeup_op__Fv)
+                  00009ad0    0000002a     CC1101.obj (.text:cc1101_set_channel__FUc)
+                  00009afa    00000026     CC1101.obj (.text:CC1101ReadReg__FUc)
+                  00009b20    00000026     CC1101.obj (.text:CC1101ReadStatus__FUc)
+                  00009b46    00000026     task.obj (.text:SendConfigRequest__Fv)
+                  00009b6c    00000026     rts430.lib : boot.obj (.text:_c_int00_noexit)
+                  00009b92    00000026     main.obj (.text:band_op__Fv)
+                  00009bb8    00000026     main.obj (.text:enter_lp_mode__Fv)
+                  00009bde    00000026     rts430.lib : mult32.obj (.text)
+                  00009c04    00000024     CC1101.obj (.text:CC1101SetSYNC__FUi)
+                  00009c28    00000024     rts430.lib : fs_utof.obj (.text)
+                  00009c4c    00000024     timer_b.obj (.text:sys_clock_tick__Fv)
+                  00009c70    00000022     CC1101.obj (.text:CC1101WriteReg__FUcT1)
+                  00009c92    00000022     main.obj (.text:InitUCA0__Fv)
+                  00009cb4    00000020     main.obj (.text:InitSysClk__Fv)
+                  00009cd4    0000001e     task.obj (.text:Delay_1ms__Fv)
+                  00009cf2    0000001c     main.obj (.text:init_led__Fv)
+                  00009d0e    0000001c     main.obj (.text:stop_op__Fv)
+                  00009d2a    0000001a     timer_b.obj (.text:Timer_B__Fv)
+                  00009d44    0000001a     CC1101.obj (.text:init_cc1101_gpio__Fv)
+                  00009d5e    00000018     main.obj (.text:InitTimerA__Fv)
+                  00009d76    00000018     main.obj (.text:LED_TYPE_BOTTLE_ON__Fv)
+                  00009d8e    00000018     main.obj (.text:init_adc__Fv)
+                  00009da6    00000018     main.obj (.text:start_op__Fv)
+                  00009dbe    00000016     CC1101.obj (.text:CC1101WriteCmd__FUc)
+                  00009dd4    00000016     task.obj (.text:LED_SIGN_ON__Fv)
+                  00009dea    00000016     main.obj (.text:LED_TYPE_BAG_ON__Fv)
+                  00009e00    00000014     main.obj (.text:InitTimerB__Fv)
+                  00009e14    00000014     main.obj (.text:IsClr__FUc)
+                  00009e28    00000014     p1_int.obj (.text:IsClr__FUc)
+                  00009e3c    00000014     p2_int.obj (.text:IsClr__FUc)
+                  00009e50    00000014     task.obj (.text:IsClr__FUc)
+                  00009e64    00000014     timer_a.obj (.text:IsClr__FUc)
+                  00009e78    00000014     main.obj (.text:IsSet__FUc)
+                  00009e8c    00000014     timer_a.obj (.text:IsSet__FUc)
+                  00009ea0    00000014     CC1101.obj (.text:init_cc1101__Fv)
+                  00009eb4    00000014     rts430.lib : memset.obj (.text:memset)
+                  00009ec8    00000012     CC1101.obj (.text:init_spi__Fv)
+                  00009eda    00000012     rts430.lib : memcpy.obj (.text:memcpy)
+                  00009eec    00000010     CC1101.obj (.text:CC1101GetRXCnt__Fv)
+                  00009efc    00000010     main.obj (.text:LedAllSwitchOff__Fv)
+                  00009f0c    00000010     p1_int.obj (.text:LedAllSwitchOff__Fv)
+                  00009f1c    00000010     rts430.lib : epilog.obj (.text)
+                  00009f2c    0000000e     CC1101.obj (.text:CC1101ClrRXBuff__Fv)
+                  00009f3a    0000000e     CC1101.obj (.text:CC1101ClrTXBuff__Fv)
+                  00009f48    0000000e     main.obj (.text:init_beep__Fv)
+                  00009f56    0000000e     main.obj (.text:quit_config__Fv)
+                  00009f64    0000000c     main.obj (.text:disable_wdt__Fv)
+                  00009f70    0000000c     timer_a.obj (.text:disable_wdt__Fv)
+                  00009f7c    0000000c     main.obj (.text:init_wdt__Fv)
+                  00009f88    0000000c     main.obj (.text:quit_lp_mode__Fv)
+                  00009f94    0000000a     CC1101.obj (.text:CC1101SetIdle__Fv)
+                  00009f9e    0000000a     timer_b.obj (.text:local_ticktime__Fv)
+                  00009fa8    0000000a     main.obj (.text:reset_req_ack_tickTime__Fv)
+                  00009fb2    0000000a     main.obj (.text:weighter_cal_op__Fv)
+                  00009fbc    00000006     task.obj (.text:ADC10_ISR__Fv)
+                  00009fc2    00000004     rts430.lib : pre_init.obj (.text:_system_pre_init)
+                  00009fc6    00000004                : exit.obj (.text:abort)
+                  00009fca    00000002                : _lock.obj (.text:_nop)
+
+.cinit     0    00009fcc    000000b6     
+                  00009fcc    00000059     main.obj (.cinit)
+                  0000a025    00000001     --HOLE-- [fill = 0]
+                  0000a026    00000023     task.obj (.cinit)
+                  0000a049    00000001     --HOLE-- [fill = 0]
+                  0000a04a    00000018     CC1101.obj (.cinit)
+                  0000a062    00000011     timer_a.obj (.cinit)
+                  0000a073    00000001     --HOLE-- [fill = 0]
+                  0000a074    0000000b     p1_int.obj (.cinit)
+                  0000a07f    00000001     --HOLE-- [fill = 0]
+                  0000a080    00000002     (.pad.cinit) [fill = 0]
+
+.const     0    0000a082    0000003e     
+                  0000a082    00000034     CC1101.obj (.const:CC1101InitData)
+                  0000a0b6    0000000a     CC1101.obj (.const:Channel_Table)
+
+.int02     0    0000ffe4    00000002     
+                  0000ffe4    00000002     p1_int.obj (.int02)
+
+.int03     0    0000ffe6    00000002     
+                  0000ffe6    00000002     p2_int.obj (.int03)
+
+.int05     0    0000ffea    00000002     
+                  0000ffea    00000002     task.obj (.int05)
+
+.int09     0    0000fff2    00000002     
+                  0000fff2    00000002     timer_a.obj (.int09)
+
+.int10     0    0000fff4    00000002     
+                  0000fff4    00000002     main.obj (.int10)
+
+.int13     0    0000fffa    00000002     
+                  0000fffa    00000002     timer_b.obj (.int13)
+
+.reset     0    0000fffe    00000002     
+                  0000fffe    00000002     rts430.lib : boot.obj (.reset)
+
+
+GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
+
+address    name
+--------   ----
+00000200   .bss
+00008000   .text
+0000004a   ADC10AE0
+0000004b   ADC10AE1
+000001b0   ADC10CTL0
+000001b2   ADC10CTL1
+00000048   ADC10DTC0
+00000049   ADC10DTC1
+000001b4   ADC10MEM
+000001bc   ADC10SA
+00009fbc   ADC10_ISR__Fv
+00000256   ADS1230_notified_flag
+00000057   BCSCTL1
+00000058   BCSCTL2
+00000053   BCSCTL3
+00000255   ButtonIntSrc
+00009fc6   C$$EXIT
+000010fb   CALBC1_12MHZ
+000010f9   CALBC1_16MHZ
+000010ff   CALBC1_1MHZ
+000010fd   CALBC1_8MHZ
+000010fa   CALDCO_12MHZ
+000010f8   CALDCO_16MHZ
+000010fe   CALDCO_1MHZ
+000010fc   CALDCO_8MHZ
+00009f2c   CC1101ClrRXBuff__Fv
+00009f3a   CC1101ClrTXBuff__Fv
+00009eec   CC1101GetRXCnt__Fv
+00008f00   CC1101Init__Fv
+00009398   CC1101ReadMultiReg__FUcPUcT1
+00009afa   CC1101ReadReg__FUc
+00009b20   CC1101ReadStatus__FUc
+00008674   CC1101RecPacket__FPUc
+000099a8   CC1101Reset__Fv
+000085a8   CC1101SendPacket__FPUcUc12TX_DATA_MODE
+00009f94   CC1101SetIdle__Fv
+00009c04   CC1101SetSYNC__FUi
+000097de   CC1101SetTRMode__F6TRMODE
+00009dbe   CC1101WriteCmd__FUc
+00009604   CC1101WriteMultiReg__FUcPUcT1
+00009c70   CC1101WriteReg__FUcT1
+0000021e   ContainerType
+00000211   ContainerType_change
+000099da   ContainerType_change_op__Fv
+00000056   DCOCTL
+00009cd4   Delay_1ms__Fv
+0000981a   Delay_nms__FUl
+00000128   FCTL1
+0000012a   FCTL2
+0000012c   FCTL3
+00009336   HeartBeat__Fv
+00000000   IE1
+00000001   IE2
+00000002   IFG1
+00000003   IFG2
+000097d8   L_LSL_1
+000097b4   L_LSL_10
+000097b0   L_LSL_11
+000097ac   L_LSL_12
+000097a8   L_LSL_13
+000097a4   L_LSL_14
+000097a0   L_LSL_15
+000097d4   L_LSL_2
+000097d0   L_LSL_3
+000097cc   L_LSL_4
+000097c8   L_LSL_5
+000097c4   L_LSL_6
+000097c0   L_LSL_7
+000097bc   L_LSL_8
+000097b8   L_LSL_9
+000094aa   L_LSR_1
+00009474   L_LSR_10
+0000946e   L_LSR_11
+00009468   L_LSR_12
+00009462   L_LSR_13
+0000945c   L_LSR_14
+00009456   L_LSR_15
+000094a4   L_LSR_2
+0000949e   L_LSR_3
+00009498   L_LSR_4
+00009492   L_LSR_5
+0000948c   L_LSR_6
+00009486   L_LSR_7
+00009480   L_LSR_8
+0000947a   L_LSR_9
+00000222   MyChannel
+00000220   MyId
+00000022   P1DIR
+00000025   P1IE
+00000024   P1IES
+00000023   P1IFG
+00000020   P1IN
+00000021   P1OUT
+00000027   P1REN
+00000026   P1SEL
+0000002a   P2DIR
+0000002d   P2IE
+0000002c   P2IES
+0000002b   P2IFG
+00000028   P2IN
+00000029   P2OUT
+0000002f   P2REN
+0000002e   P2SEL
+0000001a   P3DIR
+00000018   P3IN
+00000019   P3OUT
+00000010   P3REN
+0000001b   P3SEL
+0000001e   P4DIR
+0000001c   P4IN
+0000001d   P4OUT
+00000011   P4REN
+0000001f   P4SEL
+0000873a   PORT1_ISR__Fv
+000092d2   PORT2_ISR__Fv
+0000023e   PaTabel
+000089ea   ProcessRcvdPacket__FPUcUc
+00009892   ReadFlash__FUiPUcUc
+00008bc0   ReadWeight__Fv
+00009184   Run__Fv
+00009562   SPI_ExchangeByte__FUc
+00009b46   SendConfigRequest__Fv
+000093f8   Start__Fv
+0000993e   Stop__Fv
+00000172   TACCR0
+00000174   TACCR1
+00000176   TACCR2
+00000162   TACCTL0
+00000164   TACCTL1
+00000166   TACCTL2
+00000160   TACTL
+0000012e   TAIV
+00000170   TAR
+00000192   TBCCR0
+00000194   TBCCR1
+00000196   TBCCR2
+00000182   TBCCTL0
+00000184   TBCCTL1
+00000186   TBCCTL2
+00000180   TBCTL
+0000011e   TBIV
+00000190   TBR
+0000839e   Timer_A__Fv
+00009d2a   Timer_B__Fv
+0000005d   UCA0ABCTL
+00000062   UCA0BR0
+00000063   UCA0BR1
+00000060   UCA0CTL0
+00000061   UCA0CTL1
+0000005f   UCA0IRRCTL
+0000005e   UCA0IRTCTL
+00000064   UCA0MCTL
+00000066   UCA0RXBUF
+00000065   UCA0STAT
+00000067   UCA0TXBUF
+0000006a   UCB0BR0
+0000006b   UCB0BR1
+00000068   UCB0CTL0
+00000069   UCB0CTL1
+0000006c   UCB0I2CIE
+00000118   UCB0I2COA
+0000011a   UCB0I2CSA
+0000006e   UCB0RXBUF
+0000006d   UCB0STAT
+0000006f   UCB0TXBUF
+00000120   WDTCTL
+00008d6c   WriteFlash__FUiPUcUc
+00000600   __STACK_END
+00000050   __STACK_SIZE
+00000001   __TI_args_main
+00000001   __TI_auto_init
+00000001   __TI_exit
+ffffffff   __binit__
+00000200   __bss__
+ffffffff   __c_args__
+00009fcc   __cinit__
+000094b2   __divul
+00000257   __end__
+00009fcc   __etext__
+0000814c   __fs_add
+00008b26   __fs_div
+00008146   __fs_sub
+000096da   __fs_tou
+00009a3e   __fs_ultof
+00009c28   __fs_utof
+00009bde   __mpyl
+ffffffff   __pinit__
+000094b2   __remul
+00008000   __text__
+00009694   _auto_init
+00009b6c   _c_int00
+00009b6c   _c_int00_noexit
+0000024a   _cleanup_ptr
+0000024c   _dtors_ptr
+0000024e   _local_time_tick
+00000246   _lock
+00009fca   _nop
+0000fffe   _reset_vector
+000005b0   _stack
+00009fc2   _system_pre_init
+00000248   _unlock
+00009fc6   abort
+00000234   adc_con_finish
+00008e7a   ads1230_Calibrate__Fv
+000084bc   ads1230_sample_data__FPUlUcT2
+000087fc   ads1230_start_calibrate__Fv
+000098cc   ads_delay__FUi
+0000020b   bNeedCalibrate
+0000020c   bNeedConfig
+0000020a   bPacketRcv
+00000210   bRun
+0000020e   bStart
+0000020f   bStop
+0000020d   b_node_configured
+00009b92   band_op__Fv
+00009a0c   beep_beep__Fv
+ffffffff   binit
+000095b6   bond_failed_indicate__Fv
+00009004   bond_led_indicate__Fv
+000088a6   bond_success_indicate__Fv
+0000964c   cal_led_indicate__Fv
+00009202   calibrate_success_indicate__Fv
+00009ad0   cc1101_set_channel__FUc
+00000208   channel_freq_num
+00000209   channel_getted
+00009fcc   cinit
+00009720   dev_request__Fv
+00000257   end
+00009bb8   enter_lp_mode__Fv
+00009fcc   etext
+00009f28   func_epilog_1
+00009f26   func_epilog_2
+00009f24   func_epilog_3
+00009f22   func_epilog_4
+00009f20   func_epilog_5
+00009f1e   func_epilog_6
+00009f1c   func_epilog_7
+00008a88   get_battery_value__Fv
+00009ea0   init_cc1101__Fv
+00009856   init_drivers__Fv
+00009f9e   local_ticktime__Fv
+00000212   lp_mode_flag
+00008948   main
+00009eda   memcpy
+00009eb4   memset
+ffffffff   pinit
+00008c52   process_rf_op__Fv
+00009f56   quit_config__Fv
+00009f88   quit_lp_mode__Fv
+00000207   re_try_times
+00009fa8   reset_req_ack_tickTime__Fv
+00009084   send_freq_get_request__Fv
+00009da6   start_op__Fv
+00009d0e   stop_op__Fv
+0000950a   sweep_freq_ask__Fv
+00009c4c   sys_clock_tick__Fv
+0000926c   timeout__FUlT1
+0000023d   tx_done
+0000023c   tx_enable
+00009760   usart_send_bytes__FPUcUc
+00000206   wakeUp_from_wdt
+00009974   watchdog_timer__Fv
+00000200   wdt_times_cnt
+00009aa0   wdt_wakeup_op__Fv
+00000224   weight_def
+00009104   weight_led__FUc
+00009fb2   weighter_cal_op__Fv
+
+
+GLOBAL SYMBOLS: SORTED BY Symbol Address 
+
+address    name
+--------   ----
+00000000   IE1
+00000001   IE2
+00000001   __TI_args_main
+00000001   __TI_auto_init
+00000001   __TI_exit
+00000002   IFG1
+00000003   IFG2
+00000010   P3REN
+00000011   P4REN
+00000018   P3IN
+00000019   P3OUT
+0000001a   P3DIR
+0000001b   P3SEL
+0000001c   P4IN
+0000001d   P4OUT
+0000001e   P4DIR
+0000001f   P4SEL
+00000020   P1IN
+00000021   P1OUT
+00000022   P1DIR
+00000023   P1IFG
+00000024   P1IES
+00000025   P1IE
+00000026   P1SEL
+00000027   P1REN
+00000028   P2IN
+00000029   P2OUT
+0000002a   P2DIR
+0000002b   P2IFG
+0000002c   P2IES
+0000002d   P2IE
+0000002e   P2SEL
+0000002f   P2REN
+00000048   ADC10DTC0
+00000049   ADC10DTC1
+0000004a   ADC10AE0
+0000004b   ADC10AE1
+00000050   __STACK_SIZE
+00000053   BCSCTL3
+00000056   DCOCTL
+00000057   BCSCTL1
+00000058   BCSCTL2
+0000005d   UCA0ABCTL
+0000005e   UCA0IRTCTL
+0000005f   UCA0IRRCTL
+00000060   UCA0CTL0
+00000061   UCA0CTL1
+00000062   UCA0BR0
+00000063   UCA0BR1
+00000064   UCA0MCTL
+00000065   UCA0STAT
+00000066   UCA0RXBUF
+00000067   UCA0TXBUF
+00000068   UCB0CTL0
+00000069   UCB0CTL1
+0000006a   UCB0BR0
+0000006b   UCB0BR1
+0000006c   UCB0I2CIE
+0000006d   UCB0STAT
+0000006e   UCB0RXBUF
+0000006f   UCB0TXBUF
+00000118   UCB0I2COA
+0000011a   UCB0I2CSA
+0000011e   TBIV
+00000120   WDTCTL
+00000128   FCTL1
+0000012a   FCTL2
+0000012c   FCTL3
+0000012e   TAIV
+00000160   TACTL
+00000162   TACCTL0
+00000164   TACCTL1
+00000166   TACCTL2
+00000170   TAR
+00000172   TACCR0
+00000174   TACCR1
+00000176   TACCR2
+00000180   TBCTL
+00000182   TBCCTL0
+00000184   TBCCTL1
+00000186   TBCCTL2
+00000190   TBR
+00000192   TBCCR0
+00000194   TBCCR1
+00000196   TBCCR2
+000001b0   ADC10CTL0
+000001b2   ADC10CTL1
+000001b4   ADC10MEM
+000001bc   ADC10SA
+00000200   .bss
+00000200   __bss__
+00000200   wdt_times_cnt
+00000206   wakeUp_from_wdt
+00000207   re_try_times
+00000208   channel_freq_num
+00000209   channel_getted
+0000020a   bPacketRcv
+0000020b   bNeedCalibrate
+0000020c   bNeedConfig
+0000020d   b_node_configured
+0000020e   bStart
+0000020f   bStop
+00000210   bRun
+00000211   ContainerType_change
+00000212   lp_mode_flag
+0000021e   ContainerType
+00000220   MyId
+00000222   MyChannel
+00000224   weight_def
+00000234   adc_con_finish
+0000023c   tx_enable
+0000023d   tx_done
+0000023e   PaTabel
+00000246   _lock
+00000248   _unlock
+0000024a   _cleanup_ptr
+0000024c   _dtors_ptr
+0000024e   _local_time_tick
+00000255   ButtonIntSrc
+00000256   ADS1230_notified_flag
+00000257   __end__
+00000257   end
+000005b0   _stack
+00000600   __STACK_END
+000010f8   CALDCO_16MHZ
+000010f9   CALBC1_16MHZ
+000010fa   CALDCO_12MHZ
+000010fb   CALBC1_12MHZ
+000010fc   CALDCO_8MHZ
+000010fd   CALBC1_8MHZ
+000010fe   CALDCO_1MHZ
+000010ff   CALBC1_1MHZ
+00008000   .text
+00008000   __text__
+00008146   __fs_sub
+0000814c   __fs_add
+0000839e   Timer_A__Fv
+000084bc   ads1230_sample_data__FPUlUcT2
+000085a8   CC1101SendPacket__FPUcUc12TX_DATA_MODE
+00008674   CC1101RecPacket__FPUc
+0000873a   PORT1_ISR__Fv
+000087fc   ads1230_start_calibrate__Fv
+000088a6   bond_success_indicate__Fv
+00008948   main
+000089ea   ProcessRcvdPacket__FPUcUc
+00008a88   get_battery_value__Fv
+00008b26   __fs_div
+00008bc0   ReadWeight__Fv
+00008c52   process_rf_op__Fv
+00008d6c   WriteFlash__FUiPUcUc
+00008e7a   ads1230_Calibrate__Fv
+00008f00   CC1101Init__Fv
+00009004   bond_led_indicate__Fv
+00009084   send_freq_get_request__Fv
+00009104   weight_led__FUc
+00009184   Run__Fv
+00009202   calibrate_success_indicate__Fv
+0000926c   timeout__FUlT1
+000092d2   PORT2_ISR__Fv
+00009336   HeartBeat__Fv
+00009398   CC1101ReadMultiReg__FUcPUcT1
+000093f8   Start__Fv
+00009456   L_LSR_15
+0000945c   L_LSR_14
+00009462   L_LSR_13
+00009468   L_LSR_12
+0000946e   L_LSR_11
+00009474   L_LSR_10
+0000947a   L_LSR_9
+00009480   L_LSR_8
+00009486   L_LSR_7
+0000948c   L_LSR_6
+00009492   L_LSR_5
+00009498   L_LSR_4
+0000949e   L_LSR_3
+000094a4   L_LSR_2
+000094aa   L_LSR_1
+000094b2   __divul
+000094b2   __remul
+0000950a   sweep_freq_ask__Fv
+00009562   SPI_ExchangeByte__FUc
+000095b6   bond_failed_indicate__Fv
+00009604   CC1101WriteMultiReg__FUcPUcT1
+0000964c   cal_led_indicate__Fv
+00009694   _auto_init
+000096da   __fs_tou
+00009720   dev_request__Fv
+00009760   usart_send_bytes__FPUcUc
+000097a0   L_LSL_15
+000097a4   L_LSL_14
+000097a8   L_LSL_13
+000097ac   L_LSL_12
+000097b0   L_LSL_11
+000097b4   L_LSL_10
+000097b8   L_LSL_9
+000097bc   L_LSL_8
+000097c0   L_LSL_7
+000097c4   L_LSL_6
+000097c8   L_LSL_5
+000097cc   L_LSL_4
+000097d0   L_LSL_3
+000097d4   L_LSL_2
+000097d8   L_LSL_1
+000097de   CC1101SetTRMode__F6TRMODE
+0000981a   Delay_nms__FUl
+00009856   init_drivers__Fv
+00009892   ReadFlash__FUiPUcUc
+000098cc   ads_delay__FUi
+0000993e   Stop__Fv
+00009974   watchdog_timer__Fv
+000099a8   CC1101Reset__Fv
+000099da   ContainerType_change_op__Fv
+00009a0c   beep_beep__Fv
+00009a3e   __fs_ultof
+00009aa0   wdt_wakeup_op__Fv
+00009ad0   cc1101_set_channel__FUc
+00009afa   CC1101ReadReg__FUc
+00009b20   CC1101ReadStatus__FUc
+00009b46   SendConfigRequest__Fv
+00009b6c   _c_int00
+00009b6c   _c_int00_noexit
+00009b92   band_op__Fv
+00009bb8   enter_lp_mode__Fv
+00009bde   __mpyl
+00009c04   CC1101SetSYNC__FUi
+00009c28   __fs_utof
+00009c4c   sys_clock_tick__Fv
+00009c70   CC1101WriteReg__FUcT1
+00009cd4   Delay_1ms__Fv
+00009d0e   stop_op__Fv
+00009d2a   Timer_B__Fv
+00009da6   start_op__Fv
+00009dbe   CC1101WriteCmd__FUc
+00009ea0   init_cc1101__Fv
+00009eb4   memset
+00009eda   memcpy
+00009eec   CC1101GetRXCnt__Fv
+00009f1c   func_epilog_7
+00009f1e   func_epilog_6
+00009f20   func_epilog_5
+00009f22   func_epilog_4
+00009f24   func_epilog_3
+00009f26   func_epilog_2
+00009f28   func_epilog_1
+00009f2c   CC1101ClrRXBuff__Fv
+00009f3a   CC1101ClrTXBuff__Fv
+00009f56   quit_config__Fv
+00009f88   quit_lp_mode__Fv
+00009f94   CC1101SetIdle__Fv
+00009f9e   local_ticktime__Fv
+00009fa8   reset_req_ack_tickTime__Fv
+00009fb2   weighter_cal_op__Fv
+00009fbc   ADC10_ISR__Fv
+00009fc2   _system_pre_init
+00009fc6   C$$EXIT
+00009fc6   abort
+00009fca   _nop
+00009fcc   __cinit__
+00009fcc   __etext__
+00009fcc   cinit
+00009fcc   etext
+0000fffe   _reset_vector
+ffffffff   __binit__
+ffffffff   __c_args__
+ffffffff   __pinit__
+ffffffff   binit
+ffffffff   pinit
+
+[267 symbols]

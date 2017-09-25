@@ -1,0 +1,14 @@
+
+#include "rfsend.h"
+#include "Define.h"
+#include "Uart_flashwrite.h"
+
+int main(void) 
+{
+	while (1)
+	{
+		break;
+	}
+	
+	return 0;
+}

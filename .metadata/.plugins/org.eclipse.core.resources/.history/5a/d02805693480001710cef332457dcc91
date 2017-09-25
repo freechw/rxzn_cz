@@ -1,0 +1,169 @@
+#include "rfsend.h"
+#include "define.h"
+#include "task.h"
+#include "flash.h"
+
+/*******************************************************************************
+ **********************external variables go here*******************************
+ ******************************************************************************/
+INT8U   bPacketRcv           = 0;
+INT8U   bHeartBeat           = 0;
+INT8U   bNeedCalibrate       = 0;
+INT8U   bNeedConfig          = 0;
+INT8U   bStart               = 0;
+INT8U   bStop                = 0;
+INT8U   bRun                 = 0;
+INT8U 	b_node_configured    = 0;
+
+extern volatile INT8U ADS1230_notified_flag ;
+extern INT16U	zero_calibrated_value;
+extern INT16U 	half_kilo_calibrated_value;
+extern int   weight;
+/******************************************************************************/
+void read_configured_data_from_flash(void)
+{
+	INT8U    temp[5];
+	ReadFlash(CTU_Addr, temp, sizeof(temp));  
+    
+    if(temp[0] == 0x55)
+    {
+	    MyId = temp[1] << 8;
+	    MyId |= temp[2];
+	    MyChannel = temp[3];
+	    b_node_configured = temp[4];
+    }
+    
+    ReadFlash(ADS_Addr0, temp, sizeof(temp));
+    
+    if(temp[0] == 0x55)
+    {
+	    zero_calibrated_value = temp[1] << 8;
+	    zero_calibrated_value |= temp[2];
+    }
+    
+	ReadFlash(ADS_Addr500, temp, sizeof(temp));
+    
+    if(temp[0] == 0x55)
+    {
+	    half_kilo_calibrated_value = temp[1] << 8;
+	    half_kilo_calibrated_value |= temp[2];
+    }
+}
+void init_drivers(void)
+{
+	_DINT(); // diable interrupt
+  	InitSysClk();
+   	InitTimerA();
+  	InitTimerB();
+  	InitP1();
+  	InitP2P3();
+  	InitP4();  	
+  	LED_ALARM_OFF;
+	
+	PowerUpResetCC1101();
+	delay(200);
+	halRfWriteRfSettings();
+	delay(20);
+		
+	read_configured_data_from_flash();
+	
+	P1OUT |= BIT3;  // release PDWN to allow normal operation of ads1230
+    P1IE |= BIT1 + BIT4 + BIT5 + BIT6;  // enable buttons and swithcer interrupt
+    P2IE |= BIT5 ;		//+ BIT2; // enable RF receiving interrupt
+    
+	_EINT();  		   // enable interrupt
+}
+
+int main(void)
+{
+	//INT8U    rbuf[MSG_LEN] = {0};
+	//INT8U    rlen;
+	int	temp;
+  	WDTCTL = WDTPW + WDTHOLD; // Stop watchdog timer
+  	
+	init_drivers();
+	ads1230_start_calibrate();
+	
+	while(1)
+	{
+		/*if(b_node_configured == 1) //床位配置成功
+		{
+			if (IsSet(bHeartBeat))
+			{
+				CLR_FLG(bHeartBeat);
+			
+				if (IsSet(bRun))
+				{
+					Run();
+				}
+				HeartBeat();
+			}
+			if (IsSet(bStart))
+			{
+				Start();
+				CLR_FLG(bStart);
+			}
+			
+			if (IsSet(bStop))
+			{
+				Stop();
+				CLR_FLG(bStop);
+			}
+		}
+		
+		if(IsSet(bPacketRcv))
+		{
+			CLR_FLG(bPacketRcv);
+			rlen = sizeof(rbuf);
+			if(halRfReceivePacket(rbuf, &rlen))
+			{
+				ProcessRcvdPacket(rbuf, rlen);
+			}
+
+		    memset(rbuf, 0, MSG_LEN);
+		}
+		
+		if (IsSet(bNeedCalibrate))//  长按K1
+		{
+			CLR_FLG(bNeedCalibrate);
+			Calibrate();//todo 容器校准 
+		}
+		
+		if (IsSet(bNeedConfig))  // 配置床号， 长按K2
+		{
+			CLR_FLG(bNeedConfig);
+			// todo 全频点扫描通信，选择通信成功的频点，保存
+			SendConfigRequest();
+		}
+		
+		if(ADS1230_notified_flag == 1)
+		{
+			weight = ReadWeightSensor();
+			if(weight != temp)
+			{
+				temp = weight;
+				LED_WEIGHT_ON_4;
+				
+			}
+			else 
+			{
+				LED_WEIGHT_ON_5;	
+			}
+			ADS_DOUT_INT_E;  // enable interrupt of P1.1
+			ADS1230_notified_flag = 0;
+			ads1230_start_calibrate();
+		}*/
+		if(ADS1230_notified_flag == 1)
+		{
+			LED_WEIGHT_ON_2;			
+			weight = ReadWeightSensor();
+			ADS_DOUT_INT_E;  // enable interrupt of P1.1
+		}
+		/*else
+		{
+			LED_WEIGHT_ON_4;
+			ADS_DOUT_INT_E;  // enable interrupt of P1.1
+		}*/
+		__bis_SR_register_on_exit(LPM3_bits);
+	}
+}

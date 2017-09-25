@@ -1,0 +1,346 @@
+//#include "msp430f2272.h"
+#include "rfsend.h"
+#include "define.h"
+#include "task.h"
+#include "flash.h"
+
+/*******************************************************************************
+ ************************global variables***************************************
+ ******************************************************************************/
+eContainerType  ContainerType  = BAG;
+INT8U           BlinkIntvCnt   = 0;
+
+INT16U          MyId           = 0x0000;  // my own identifier
+INT8U           MyChannel      = 0x25;   // default channle rate is 37?
+extern INT8U 	b_node_configured ;
+struct WEIGHT_STRUCT weight_def;
+extern INT8U ADS1230_notified_flag;
+unsigned long weight;
+static INT16U   TransactionID = 0;
+
+/*******************************************************************************
+ **********************            ADS1230    **********************************
+ ******************************************************************************/
+#define ADS_CLk_SET() P1OUT |= BIT2
+#define ADS_CLK_CLR() P1OUT &= ~BIT2
+#define ADS_DOUT()	  P1IN & BIT1
+
+void ads1230_start_calibrate(void){
+	unsigned long temp = 0;
+	_DINT();
+	ADS_CLK_CLR();
+	
+	for(int i = 0; i < 24; i++){
+		ADS_CLk_SET();
+		delay(1);
+		ADS_CLK_CLR();
+		
+		if(ADS_DOUT()){
+			temp = (temp << 1) | 0x01; 
+		}
+		else{
+			temp = temp << 1;	
+		}
+		
+		delay(1);
+	}
+	//25th clock
+	ADS_CLk_SET();
+	delay(1);
+	ADS_CLK_CLR();
+	delay(1);
+	//26th clock
+	ADS_CLk_SET();
+	delay(1);
+	ADS_CLK_CLR();
+	delay(1);
+	_EINT();
+}
+
+static unsigned long ReadWeightSensor(void) {
+	unsigned long temp = 0;
+	_DINT();
+	ADS_CLK_CLR();
+	
+	for(int i = 0; i < 20; i++)	{
+		ADS_CLk_SET();
+		delay(1);
+		ADS_CLK_CLR();
+		
+		if(ADS_DOUT()){
+			temp = (temp << 1) | 0x01; 
+		}
+		else{
+			temp = temp << 1;	
+		}
+		
+		delay(1);
+	}
+	ADS_CLk_SET();
+	delay(1);
+	ADS_CLK_CLR();
+	delay(1);
+	_EINT();
+	return temp;
+}
+
+void ads1203_get_sampled_data_mean_value(INT8U* data, INT8U datalen, INT8U* mean_value){
+	
+//todo	
+}
+#define MAX_CALIBRATE_TIMES 10
+static INT8U ads1230_DoCalibrate(INT16U addr){
+	INT8U i;
+	INT16U data;
+   	INT8U  buf_flash[3];
+   	ulong sum_weight = 0;
+   	
+   	if((addr != ADS_ADDR0G) && (addr != ADS_ADDR500G)){
+   		return 1;
+   	}
+   	
+   	for( i = 0; i < MAX_CALIBRATE_TIMES; i++){
+   		while(ADS1230_notified_flag == 0);
+   		ADS1230_notified_flag = 0;
+   		ADS_DOUT_INT_E;  			// enable interrupt of P1.1
+   		data = ReadWeightSensor();   
+   		sum_weight += data;		
+   	}
+   	data =  sum_weight / MAX_CALIBRATE_TIMES;
+   	//ads1203_get_sampled_data_mean_value(data, MAX_CALIBRATE_TIMES, mean_value);
+   	buf_flash[0] = FLASH_VALID;
+   	buf_flash[1] = data >> 8;
+   	buf_flash[2] = data;
+  
+   	if(addr == ADS_ADDR0G){
+   		weight_def.zero_calibrated_value = data;   		
+   	}
+   	else{
+   		weight_def.half_kilo_calibrated_value = data;
+   	}
+	
+   	return (WriteFlash(addr, buf_flash, sizeof(buf_flash)));
+}
+
+void ads1230_Calibrate(void){
+	INT8U ret = 0xff;
+	//0g
+	if(DIAL_SWITCH1_ON){
+      	ret = ads1230_DoCalibrate(ADS_ADDR0G);
+  		if (0 == ret){
+  			BeepOnce();
+  			AllWeightLedBlinkOnce();
+  		}
+  	}
+  	//500g
+  	else if(DIAL_SWITCH2_ON){
+  	  	ret = ads1230_DoCalibrate(ADS_ADDR500G);
+  		if (0 == ret){
+  			BeepTwice();
+  			AllWeightLedBlinkTwice();
+  		}
+  	}
+}
+ 
+unsigned long ReadWeight(void){
+	INT16U ads0 = 0;
+	INT16U ads500 = 0;
+	unsigned long temp_weight = 0;
+	
+	while(ADS1230_notified_flag == 0);
+   	ADS1230_notified_flag = 0;
+   	ADS_DOUT_INT_E;  			// enable interrupt of P1.1
+	temp_weight = ReadWeightSensor();
+    ads0 = weight_def.zero_calibrated_value;
+    ads500 = weight_def.half_kilo_calibrated_value;
+    if (ads500 > ads0){
+    	weight -= ads0;
+    	weight *= 500;
+    	weight /= (ads500 - ads0);
+    }
+    else{
+    	return 0;
+    }
+    
+    return temp_weight;
+}
+
+/*******************************************************************************
+ **************************APIs go here*****************************************
+ ******************************************************************************/
+ 
+static void WeightLedFlush(INT16U weight){
+	if(weight >= 1000){
+	   LED_WEIGHT_ON_6;
+	}
+	else if(weight >= 750){
+	   LED_WEIGHT_ON_5;
+	}
+	else if(weight >= 500){
+	   LED_WEIGHT_ON_4;
+	}
+	else if(weight >= 250){
+	   LED_WEIGHT_ON_3;
+	}
+	else if(weight >= 125){
+	   LED_WEIGHT_ON_2;
+	}
+	else if(weight > 0){
+	   LED_WEIGHT_ON_1;
+	}
+	else{
+	   LED_WEIGHT_ON_0;
+	}
+}
+
+static INT8U CheckRData(INT8U *rbuf, INT8U rlen){
+	INT8U tcrc = 0;
+	
+	if (MSG_LEN != rlen){
+		return FALSE;
+	}
+	
+	for(INT8U i = 2; i < rlen - 1; i++){
+		tcrc += rbuf[i];
+	}
+	
+	if(tcrc == rbuf[rlen - 1]){
+	   return TRUE;
+	}
+	else{
+	   return FALSE;
+	}
+}
+static void SendPacket(INT8U *buf, INT8U len){
+	INT8U i;
+	if (MSG_LEN != len){
+		return;
+	}
+	
+	buf[2] = HEAD_H;
+	buf[3] = HEAD_L;
+	buf[4] = 0x3b;
+	
+	for(i = 0; i < len - 1; i++){
+		buf[len - 1] += buf[i];
+	}
+	// 2次发送信息，保证能够接收到有效信息
+	for(i = 0; i < 2; i++){
+		halRfSendPacket(buf, len);
+		Delay_ms(100);
+	}
+    
+    if (LED_SWITCH_ON){
+    	SendBlink();
+    }
+}
+void Start(void){
+	INT16U weight;
+	INT8U  tbuf[MSG_LEN] = {0};
+	
+	weight = ReadWeight();
+	
+	/*if (0 == weight)
+	{
+		return;
+	}*/
+	TransactionID = 0;
+	tbuf[MSG_OP_TYPE] = START;
+	
+	tbuf[MSG_BODY_0] = MyId >> 8;
+	tbuf[MSG_BODY_1] = MyId;
+	tbuf[MSG_BODY_2] = weight >> 8;
+	tbuf[MSG_BODY_3] = weight;
+	tbuf[MSG_BODY_4] = ContainerType;
+
+	SendPacket(tbuf, sizeof(tbuf));
+	
+	WeightLedFlush(weight);
+	
+	SET_FLG(bRun);
+}
+
+void Run(void)
+{
+	INT8U  tbuf[MSG_LEN] = {0};
+	//weight = ReadWeight();
+		
+	TransactionID++;
+	tbuf[MSG_OP_TYPE] = RUN;
+	tbuf[MSG_BODY_0] = MyId >> 8;
+	tbuf[MSG_BODY_1] = MyId;
+	tbuf[MSG_BODY_2] = weight >> 8;
+	tbuf[MSG_BODY_3] = weight;
+	tbuf[MSG_BODY_4] = ContainerType ;
+	tbuf[MSG_BODY_5] = 0;
+	
+	SendPacket(tbuf, sizeof(tbuf));
+	
+	WeightLedFlush(weight);
+}
+
+void Stop(void)
+{
+	INT8U  tbuf[MSG_LEN] = {0};
+	
+	tbuf[MSG_OP_TYPE] = STOP;
+	
+	tbuf[MSG_BODY_0] = MyId >> 8;
+	tbuf[MSG_BODY_1] = MyId;
+
+	SendPacket(tbuf, sizeof(tbuf));
+	
+	WeightLedFlush(0); // shut down all LEDs
+	
+	CLR_FLG(bRun);
+}
+
+
+void HeartBeat(void)
+{
+	INT8U tbuf[MSG_LEN] = {0};
+ 
+	tbuf[MSG_OP_TYPE] = BEAT;
+	
+	tbuf[MSG_BODY_0] = MyId >> 8;
+	tbuf[MSG_BODY_1] = MyId;
+
+	SendPacket(tbuf, sizeof(tbuf));
+}
+
+void SendConfigRequest(void)
+{
+	INT8U  tbuf[MSG_LEN] = {0};
+
+	tbuf[MSG_OP_TYPE] = W_REG;
+
+	SendPacket(tbuf, sizeof(tbuf));
+}
+
+void ProcessRcvdPacket(INT8U *rbuf, INT8U rlen)
+{
+	INT8U tbuf[5];
+	
+	if (FALSE == CheckRData(rbuf, rlen))
+	{
+		return;
+	}
+	
+	switch(rbuf[MSG_OP_TYPE])
+	{
+		case W_REG:
+			tbuf[0] = 0x55;
+			tbuf[1] = rbuf[MSG_BODY_0];
+			tbuf[2] = rbuf[MSG_BODY_1];
+			tbuf[3] = MyChannel;
+			b_node_configured = 1;
+			tbuf[4] = b_node_configured;
+			MyId = tbuf[1] << 8 + tbuf[2];
+			
+			(void)WriteFlash(CTU_Addr, tbuf, sizeof(tbuf));
+			LED_ALARM_ON;
+			break;
+		default:
+			break;
+	}
+}

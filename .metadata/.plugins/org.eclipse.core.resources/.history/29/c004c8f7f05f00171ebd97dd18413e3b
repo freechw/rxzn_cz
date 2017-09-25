@@ -1,0 +1,18 @@
+#include "rfsend.h"
+#include "Define.h"
+#include "flash.h"
+
+int main(void) 
+{
+	P1IN &= ~(BIT0 + BIT1 + BIT2);
+	P2IN &= ~BIT4;
+	
+	P3IN &= ~BIT6;
+	
+	P4IN &= ~(BIT4 + BIT5 +BIT6 + BIT7);
+	
+	while (1)
+	{
+		break;
+	}
+}

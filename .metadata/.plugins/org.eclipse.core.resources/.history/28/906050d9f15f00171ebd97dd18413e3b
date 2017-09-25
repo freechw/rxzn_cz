@@ -1,0 +1,18 @@
+/*
+ * created on 2017/6/30
+ * author: chwang
+ */
+ 
+#ifndef INTERRUPT_H_
+#define INTERRUPT_H_
+ 
+extern INT8U   bPacketRcv;
+extern INT8U   bHeartBeat;
+extern INT8U   bNeedCalibrate;
+extern INT8U   bNeedConfig;
+extern INT8U   bStart;
+extern INT8U   bStop;
+
+extern INT8U   ButtonIntSrc; // 0 for FUNCT_BUTTON, 1 for START_BUTTON
+
+#endif /*INTERRUPT_H_*/

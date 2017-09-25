@@ -1,0 +1,260 @@
+#ifndef TASK_H_
+#define TASK_H_
+
+#include <string.h>
+#include "tools.h"
+#include "msp430f2272.h"
+
+/*******************************************************************************
+ ****************************macros go here*************************************
+ ******************************************************************************/
+// weight leds
+#define LED01 (~BIT5)
+#define LED00 (BIT5)
+#define LED11 (~BIT6)
+#define LED10 (BIT6)
+#define LED21 (~BIT7)
+#define LED20 (BIT7)
+#define LED31 (~BIT2)
+#define LED30 (BIT2)
+#define LED41 (~BIT1)
+#define LED40 (BIT1)
+#define LED51 (~BIT0)
+#define LED50 (BIT0)
+
+#define LED_WEIGHT_ON_6 \
+		((((((P4OUT &= LED01) &= LED11) &= LED21) &= LED31) &= LED41) &= LED51)
+#define LED_WEIGHT_ON_5 \
+		((((((P4OUT &= LED01) &= LED11) &= LED21) &= LED31) &= LED41) |= LED50)
+#define LED_WEIGHT_ON_4 \
+		((((((P4OUT &= LED01) &= LED11) &= LED21) &= LED31) |= LED40) |= LED50)
+#define LED_WEIGHT_ON_3 \
+		((((((P4OUT &= LED01) &= LED11) &= LED21) |= LED30) |= LED40) |= LED50)
+#define LED_WEIGHT_ON_2 \
+		((((((P4OUT &= LED01) &= LED11) |= LED20) |= LED30) |= LED40) |= LED50)
+#define LED_WEIGHT_ON_1 \
+		((((((P4OUT &= LED01) |= LED10) |= LED20) |= LED30) |= LED40) |= LED50)
+#define LED_WEIGHT_ON_0 \
+		((((((P4OUT |= LED00) |= LED10) |= LED20) |= LED30) |= LED40) |= LED50)
+
+// status led
+#define LED_STATUS_BLINK    P1OUT ^= BIT7
+#define LED_STATUS_ON       P1OUT &= ~BIT7
+#define LED_STATUS_OFF      P1OUT |= BIT7
+
+// sign led
+#define LED_SIGN_BLINK      P4OUT ^= BIT3
+#define LED_SIGN_ON         P4OUT &= ~BIT3
+#define LED_SIGN_OFF        P4OUT |= BIT3
+    
+// alarm led
+#define LED_ALARM_ON        P4OUT &= ~BIT4
+#define LED_ALARM_OFF       P4OUT |= BIT4
+
+// beeper
+#define BEEP_ON             P2OUT &= ~BIT4
+#define BEEP_OFF            P2OUT |= BIT4
+
+// dial switcher
+#define DIAL_SWITCH1_ON     IsClr((P3IN & BIT7))
+#define DIAL_SWITCH2_ON     IsClr((P3IN & BIT6))
+
+// led switcher
+#define LED_SWITCH_ON       (!IsClr(P1IN & BIT4))
+#define LED_SWITCH_OFF      (IsClr(P1IN & BIT4))
+#define LED_SWITCH_INT      (!IsClr(P1IFG & BIT4))
+#define LED_SWITCH_INT_D    (P1IE &= ~BIT4)
+#define LED_SWITCH_INT_E    (P1IE |= BIT4)
+#define LED_SWITCH_INT_C    (P1IFG &= ~BIT4)
+
+// start button
+#define START_BUTTON_DW     (IsClr(P1IN & BIT5))
+#define START_BUTTON_UP     (!IsClr(P1IN & BIT5))
+#define START_BUTTON_INT    (!IsClr(P1IFG & BIT5))
+#define START_BUTTON_INT_D  (P1IE &= ~BIT5)
+#define START_BUTTON_INT_E  (P1IE |= BIT5)
+#define START_BUTTON_INT_C  (P1IFG &= ~BIT5)
+
+// function button
+#define FUNCT_BUTTON_DW     (IsClr(P1IN & BIT6))
+#define FUNCT_BUTTON_UP     (!IsClr(P1IN & BIT6))
+#define FUNCT_BUTTON_INT    (!IsClr(P1IFG & BIT6))
+#define FUNCT_BUTTON_INT_D  (P1IE &= ~BIT6)
+#define FUNCT_BUTTON_INT_E  (P1IE |= BIT6)
+#define FUNCT_BUTTON_INT_C  (P1IFG &= ~BIT6)
+
+#define TIMER_A_START       (TACTL |= MC_1)
+#define TIMER_A_STOP        (TACTL &= ~MC_1)
+
+// RF receiving port
+#define RF_RECV_INT         (!IsClr(P2IFG & BIT5))
+#define RF_RECV_INT_D       (P2IE &= ~BIT5)
+#define RF_RECV_INT_E       (P2IE |= BIT5)
+#define RF_RECV_INT_C       (P2IFG &= ~BIT5)
+
+// heart beat interval of timer B
+#define HB_INTVL            7
+
+// bottle blink interval of timer B
+#define BOT_BLINK_INTVL     1
+
+// long pressing interval of timer A
+#define L_PRESS_INTVL       40
+
+// short pressing interval of timer A
+#define S_PRESS_INTVL       2
+
+// the flash memory address of weighter's iformation of ID and Channel
+#define CTU_Addr            0x7000
+
+// the flash memory address of weighter's sensor data (ADS1230)
+#define            0x7200
+#define ADS_Addr500         0x7400
+
+/*******************************************************************************
+ ***************************enums goes here*************************************
+ ******************************************************************************/
+typedef enum
+{
+	BAG,
+	BOTTLE
+}eContainerType;
+
+/*******************************************************************************
+ *************************external globals**************************************
+ ******************************************************************************/
+extern eContainerType  ContainerType;
+
+extern INT8U           BlinkIntvCnt; // for bottle
+
+extern INT16U          MyId;  // my own identifier
+
+extern INT8U           MyChannel;
+
+extern INT8U           bRun;
+
+/*******************************************************************************
+ *************************APIs go here******************************************
+ ******************************************************************************/
+void Calibrate(void);
+
+void HeartBeat(void);
+
+void Calibrate(void);
+
+void Start(void);
+void Run(void);
+void Stop(void);
+
+void SendConfigRequest(void);
+
+void ProcessRcvdPacket(INT8U *rbuf, INT8U rlen);
+
+/*******************************************************************************
+ **********************inline functions go here*********************************
+ ******************************************************************************/
+inline void LedAllSwitchOff(void)
+{
+	P4OUT = 0xff;
+	P1OUT |= BIT7;
+	//P2OUT |= BIT4;
+}
+ 
+inline void SendBlink(void)
+{
+    LED_SIGN_ON;
+    Delay_ms(50);
+    LED_SIGN_OFF;
+}
+
+inline void InitSysClk(void)
+{
+	BCSCTL1 = CALBC1_1MHZ;
+	DCOCTL = CALDCO_1MHZ;
+	BCSCTL3 |= LFXT1S_2;
+}
+
+inline void InitTimerA(void)
+{
+	TACCTL0 = CCIE;
+	TACCR0 = 800;
+	//TACTL = TASSEL_1 + ID_3 + MC_1;     // SMCLK, contmode, 1/8 div
+	TACTL = TASSEL_1 + ID_0 + TACLR;  // 1 div, mc_0, timer clear
+}
+
+inline void InitTimerB(void)
+{
+	TBCCTL0 = CCIE;
+	TBCCR0 = 2500;
+	TBCTL = TBSSEL_1 + ID_3 + MC_1;
+}
+
+inline void InitP1(void)
+{
+  	P1DIR &= ~(BIT4 + BIT5 + BIT6); // input
+  	
+  	P1IES |= BIT4 + BIT5 + BIT6;  // interrupt on hight to low
+  	
+  	P1REN |= BIT4 + BIT5 + BIT6; // this line and the next 
+  	P1OUT |= BIT4 + BIT5 + BIT6; // enable the pullup resister
+  	
+  	P1SEL &= ~(BIT4 + BIT5 + BIT6); // select as I / O function
+  	
+  	P1DIR |= BIT2 | BIT3 | BIT7; // output
+  	
+  	P1OUT &= ~(BIT3 + BIT7);  // Hold nPDWN low
+}
+
+inline void InitP2(void)
+{
+  	P2IES |= BIT2+BIT5;
+	//P2SEL &= ~BIT1;                            // P2.1 output
+  	P2DIR &= ~(BIT2+BIT5);//P2DIR |= BIT2+BIT5;		//P2.2<-GDO0, P2.5<-GDO2
+  	P2DIR |= BIT0|BIT1|BIT4;  //P2.0/P2.1 output as aclk/smclk
+  	P2SEL |= BIT0|BIT1;
+}
+
+inline void InitP3(void)
+{
+  	P3SEL |= 0x00;  // P3.3,2 USCI_B0 option select
+  	P3DIR |= BIT0+BIT1+BIT3;  // P3.0->CSN, P3.1->MOSI, P3.2<-MISO, P3.3->SCLK
+  	P3DIR &= ~(BIT2+BIT6+BIT7);  // dial switch
+  	P3OUT |= BIT0;  // P3.0 output direction
+}
+
+inline void InitP4(void)
+{
+  	P4DIR |= 0xFF; // output direction
+  	P4OUT |= 0xFF; // initially all switch off
+}
+
+inline void BeepOnce(void)
+{
+	BEEP_ON;
+	Delay_ms(50);
+	BEEP_OFF;	
+}
+
+inline void BeepTwice(void)
+{
+	BEEP_ON;
+	Delay_ms(50);
+	BEEP_OFF;
+	
+	Delay_ms(150);
+	
+	BEEP_ON;
+	Delay_ms(50);
+	BEEP_OFF;
+}
+
+inline void AllWeightLedBlink(void)
+{
+    LED_WEIGHT_ON_6;
+    
+    Delay_ms(50);
+    
+    LED_WEIGHT_ON_0;
+}
+
+#endif /*TASK_H_*/

@@ -1,0 +1,34 @@
+//#include "msp430f2272.h"
+#include "Define.h"
+#include "task.h"
+#include "interrupt.h"
+
+static INT8U  hbcnt  = 0;
+
+#pragma vector = TIMERB0_VECTOR
+__interrupt void Timer_B(void)
+{	
+	if (hbcnt++ >= HB_INTVL)
+	{
+		hbcnt = 0;
+		SET_FLG(bHeartBeat);
+		__bic_SR_register_on_exit(LPM3_bits);
+	}
+	 
+	if (++BlinkIntvCnt >= BOT_BLINK_INTVL)
+	{
+		BlinkIntvCnt = 0;
+	 	
+	 	if (LED_SWITCH_ON)
+	 	{
+	 		if (BOTTLE == ContainerType)
+	 		{
+	 			LED_STATUS_BLINK;
+	 		}
+	 		else
+	 		{
+	 			LED_STATUS_ON;
+	 		}
+	 	}
+	}
+}

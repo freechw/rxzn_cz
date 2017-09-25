@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="ShowViewDialog">
+	</section>
+	<section name="WorkbenchPreferenceDialogSettings">
+		<item key="DIALOG_X_ORIGIN" value="670"/>
+		<item key="DIALOG_Y_ORIGIN" value="143"/>
+	</section>
+	<section name="StartAddressDecoration">
+		<section name="TI MSP430 USB1/MSP430">
+			<item key="StartAddressDecoration.MEM_PAGE_ID" value="0"/>
+			<list key="StartAddressDecoration.ADDRESS_LIST_ID">
+				<item value="0x05ea"/>
+				<item value="0x05fc"/>
+				<item value="0x05ee"/>
+				<item value="0x05d6"/>
+				<item value="0x05e6"/>
+				<item value="0x05de"/>
+				<item value="0x0206"/>
+				<item value="0x01000"/>
+				<item value="0x05f6"/>
+				<item value="0x020c"/>
+				<item value="0x5f8"/>
+				<item value="0x5d4"/>
+				<item value="0x022c"/>
+				<item value="0x05da"/>
+				<item value="0x05dc"/>
+				<item value="0x05d1"/>
+				<item value="0x05d4"/>
+				<item value="0x05x2"/>
+				<item value="0x05c2"/>
+				<item value="0x05c0"/>
+				<item value="0x05c6"/>
+				<item value="0x05ca"/>
+				<item value="CTU_Addr"/>
+				<item value="0x05AE"/>
+				<item value="0x01010"/>
+			</list>
+			<list key="StartAddressDecoration.ADDRESS_TEXT_ID">
+				<item value="0x01000"/>
+			</list>
+		</section>
+	</section>
+</section>

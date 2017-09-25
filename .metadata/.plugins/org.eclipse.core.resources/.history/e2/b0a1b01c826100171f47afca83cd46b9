@@ -1,0 +1,337 @@
+//#include "msp430f2272.h"
+#include "rfsend.h"
+#include "Define.h"
+#include "task.h"
+#include "flash.h"
+
+/*******************************************************************************
+ ************************global variables***************************************
+ ******************************************************************************/
+eContainerType  ContainerType  = BOTTLE;
+INT8U           BlinkIntvCnt   = 0;
+
+INT16U          MyId           = 0x1234;  // my own identifier
+INT8U           MyChannel      = 0x25; // default channle rate is 37?
+
+/*******************************************************************************
+ ************************local variables****************************************
+ ******************************************************************************/
+static INT16U   TransactionID = 0;
+
+/*******************************************************************************
+ **********************local functions go here**********************************
+ ******************************************************************************/
+static void SendPacket(INT8U *buf, INT8U len)
+{
+	if (MSG_LEN != len)
+	{
+		return;
+	}
+	
+	buf[2] = HEAD_H;
+	buf[3] = HEAD_L;
+	buf[4] = 0x3b;
+	
+	for(INT8U i = 0; i < len - 1; i++)
+	{
+		buf[len - 1] += buf[i];
+	}
+	
+    halRfSendPacket(buf, len);
+    
+    if (LED_SWITCH_ON)
+    {
+    	SendBlink();
+    }
+}
+
+static void WeightLedFlush(INT16U weight)
+{
+	if(weight >= 1000)
+	{
+	   LED_WEIGHT_ON_6;
+	}
+	else if(weight >= 750)
+	{
+	   LED_WEIGHT_ON_5;
+	}
+	else if(weight >= 500)
+	{
+	   LED_WEIGHT_ON_4;
+	}
+	else if(weight >= 250)
+	{
+	   LED_WEIGHT_ON_3;
+	}
+	else if(weight >= 125)
+	{
+	   LED_WEIGHT_ON_2;
+	}
+	else if(weight > 0)
+	{
+	   LED_WEIGHT_ON_1;
+	}
+	else
+	{
+	   LED_WEIGHT_ON_0;
+	}
+}
+
+static INT16U ReadWeightSensor(void) // ADS1230
+{
+	int temp = 1;
+	
+	for(int i = 0; i < 21; i++)
+	{
+		P1OUT &= ~BIT2;
+		
+		delay(20);
+		
+		P1OUT |= BIT2;
+		
+		delay(1);
+		
+		temp <<= 1;
+		
+		if(P1IN & BIT1)
+		{
+		  temp++;
+		}
+		
+		delay(5);
+	}
+	
+	temp >>= 1;
+	
+	return temp;
+}
+
+static INT8U DoCalibrate(INT16U addr)
+{
+	INT16U data;
+   	INT8U  tbuf[3];
+   	
+   	data = ReadWeightSensor();
+   	
+   	tbuf[0] = 0x55;
+   	tbuf[1] = data >> 8;
+   	tbuf[2] = data;
+   	
+   	return (WriteFlash(addr, tbuf, sizeof(tbuf)));
+}
+
+static INT8U CheckRData(INT8U *rbuf, INT8U rlen)
+{
+	INT8U tcrc=0;
+	
+	if (MSG_LEN != rlen)
+	{
+		return FALSE;
+	}
+	
+	for(INT8U i = 2; i < rlen - 1; i++)
+	{
+		tcrc += rbuf[i];
+	}
+	
+	if(tcrc == rbuf[rlen - 1])
+	{
+	   return TRUE;
+	}
+	else
+	{
+	   return FALSE;
+	}
+}
+
+static INT16U ReadWeight(void)
+{
+	INT8U temp[3];
+	INT16U ads0 = 0;
+	INT16U ads500 = 0;
+	INT16U weight = ReadWeightSensor();
+	
+	ReadFlash(, temp, sizeof(temp));
+    
+    if(temp[0] == 0x55)
+    {
+	    ads0 = temp[1] << 8;
+	    ads0 |= temp[2];
+    }
+	
+	ReadFlash(ADS_Addr500, temp, sizeof(temp));
+    
+    if(temp[0] == 0x55)
+    {
+	    ads500 = temp[1] << 8;
+	    ads500 |= temp[2];
+    }
+    
+    if (ads500 > ads0)
+    {
+    	weight -= ads0;
+    	weight *= 500;
+    	weight /= (ads500 - ads0);
+    }
+    else
+    {
+    	return 0;
+    }
+    
+    return weight;
+}
+
+/*******************************************************************************
+ **************************APIs go here*****************************************
+ ******************************************************************************/
+
+void Start(void)
+{
+	INT16U weight;
+	INT8U  tbuf[MSG_LEN] = {0};
+	
+	weight = ReadWeight();
+	
+	if (0 == weight)
+	{
+		return;
+	}
+	
+	tbuf[MSG_OP_TYPE] = START;
+	
+	tbuf[MSG_BODY_0] = MyId >> 8;
+	tbuf[MSG_BODY_1] = MyId;
+	tbuf[MSG_BODY_2] = weight >> 8;
+	tbuf[MSG_BODY_3] = weight;
+	tbuf[MSG_BODY_4] = ContainerType;
+
+	SendPacket(tbuf, sizeof(tbuf));
+	
+	WeightLedFlush(weight);
+	
+	SET_FLG(bRun);
+}
+
+void Run(void)
+{
+	INT16U weight;
+	INT8U  tbuf[MSG_LEN] = {0};
+
+	weight = ReadWeight();
+	
+	if (0 == weight)
+	{
+		CLR_FLG(SKeyRole);
+		SET_FLG(bStop);
+		return;
+	}
+	
+	TransactionID++;
+	
+	tbuf[MSG_OP_TYPE] = RUN;
+	
+	tbuf[MSG_BODY_0] = MyId >> 8;
+	tbuf[MSG_BODY_1] = MyId;
+	tbuf[MSG_BODY_2] = weight >> 8;
+	tbuf[MSG_BODY_3] = weight;
+	tbuf[MSG_BODY_4] = TransactionID >> 8;
+	tbuf[MSG_BODY_5] = TransactionID;
+	
+	SendPacket(tbuf, sizeof(tbuf));
+	
+	WeightLedFlush(weight);
+}
+
+void Stop(void)
+{
+	INT8U  tbuf[MSG_LEN] = {0};
+	
+	tbuf[MSG_OP_TYPE] = STOP;
+	
+	tbuf[MSG_BODY_0] = MyId >> 8;
+	tbuf[MSG_BODY_1] = MyId;
+
+	SendPacket(tbuf, sizeof(tbuf));
+	
+	WeightLedFlush(0); // shut down all LEDs
+	
+	CLR_FLG(bRun);
+}
+
+void Calibrate(void)
+{
+	INT8U ret = 0xff;
+	
+	if(DIAL_SWITCH1_ON)  //0g
+  	{
+      	ret = DoCalibrate();
+  	
+  		if (0 == ret)
+  		{
+  			BeepOnce();
+  			AllWeightLedBlinkOnce();
+  		}
+  	}
+  	else if(DIAL_SWITCH2_ON)  //500g
+  	{
+  	  	ret = DoCalibrate(ADS_Addr500);
+  	
+  		if (0 == ret)
+  		{
+  			BeepTwice();
+  			AllWeightLedBlinkTwice();
+  		}
+  	}
+}
+
+void HeartBeat(void)
+{
+	INT8U tbuf[MSG_LEN] = {0};
+ 
+	tbuf[MSG_OP_TYPE] = BEAT;
+	
+	tbuf[MSG_BODY_0] = MyId >> 8;
+	tbuf[MSG_BODY_1] = MyId;
+
+	SendPacket(tbuf, sizeof(tbuf));
+}
+
+void SendConfigRequest(void)
+{
+	INT8U  tbuf[MSG_LEN] = {0};
+
+	tbuf[MSG_OP_TYPE] = W_REG;
+
+	SendPacket(tbuf, sizeof(tbuf));
+}
+
+void ProcessRcvdPacket(INT8U *rbuf, INT8U rlen)
+{
+	INT8U operation;
+	INT8U tbuf[4];
+	
+	if (FALSE == CheckRData(rbuf, rlen))
+	{
+		return;
+	}
+	
+	operation = rbuf[MSG_OP_TYPE];
+	
+	switch(operation)
+	{
+		case W_REG:
+			tbuf[0] = 0x55;
+			tbuf[1] = rbuf[MSG_BODY_0];
+			tbuf[2] = rbuf[MSG_BODY_1];
+			tbuf[3] = MyChannel;
+			
+			MyId = tbuf[1] << 8 + tbuf[2];
+			
+			(void)WriteFlash(CTU_Addr, tbuf, sizeof(tbuf));
+
+			break;
+
+		default:
+			break;
+	}
+}

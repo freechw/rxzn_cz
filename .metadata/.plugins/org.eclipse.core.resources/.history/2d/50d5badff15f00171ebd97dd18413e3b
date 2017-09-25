@@ -1,0 +1,46 @@
+//#include "msp430f2272.h"
+#include "Define.h"
+#include "task.h"
+#include "interrupt.h"
+
+INT8U ButtonIntSrc = 0; // 0 for FUNCT_BUTTON, 1 for START_BUTTON
+
+// interrupts for the function keys
+#pragma vector=PORT1_VECTOR
+__interrupt void PORT1_ISR (void)
+{
+	if (FUNCT_BUTTON_INT)
+	{
+		FUNCT_BUTTON_INT_D;  // disable interrupt of P1.6
+
+		FUNCT_BUTTON_INT_C;  // clear interrupt flag of P1.6
+		
+		TIMER_A_START;  // start a timer
+		
+		CLR_FLG(ButtonIntSrc);
+  	
+  		FUNCT_BUTTON_INT_E;  // enable interrupt of P1.6
+	}
+	else if (START_BUTTON_INT)
+	{
+		START_BUTTON_INT_D;  // disable interrupt of P1.5
+		
+		START_BUTTON_INT_C;  // clear interrupt flag of P1.5
+		
+		TIMER_A_START;  // start a timer
+		
+		SET_FLG(ButtonIntSrc);
+  	
+  		START_BUTTON_INT_E;  // enable interrupt of P1.5
+	}
+	else if (LED_SWITCH_INT)
+	{
+		LED_SWITCH_INT_D;  // disable interrupt of P1.4
+		
+		LED_SWITCH_INT_C;  // clear interrupt flag of P1.4
+		
+		LedAllSwitchOff();  // switch off all LEDs
+  	
+  		LED_SWITCH_INT_E;  // enable interrupt of P1.4
+	}
+}
